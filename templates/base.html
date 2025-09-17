@@ -13,8 +13,10 @@
 </head>
 
 <body>
-    {{template "navbar" .}}
-    <main id="main-content" class="container">
+    <header>
+        {{template "navbar" .}}
+    </header>
+    <main id="main-content" class="container p-3">
         {{template "content" .}}
     </main>
     <footer class="footer block">

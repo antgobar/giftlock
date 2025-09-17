@@ -18,7 +18,7 @@ func NewHandler(svc *Service) *Handler {
 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /login", h.logIn)
-	mux.HandleFunc("GET /logout", h.logOut)
+	mux.HandleFunc("/logout", h.logOut)
 }
 
 func (h *Handler) logIn(w http.ResponseWriter, r *http.Request) {

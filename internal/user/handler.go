@@ -40,5 +40,5 @@ func (h *Handler) register(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "error registering user", http.StatusInternalServerError)
 		return
 	}
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, "/register", http.StatusSeeOther)
 }
