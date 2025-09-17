@@ -1,21 +1,31 @@
 {{ define "navbar" }}
-<nav class="navbar">
-    <div class="container block">
+<nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="container">
         <div class="navbar-brand">
             <a href="/" class="navbar-item">
                 <h1 class="title">Gift Lock</h1>
             </a>
+            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false"
+                onclick="this.classList.toggle('is-active'); document.getElementById('navMenuGiftLock').classList.toggle('is-active');">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
         </div>
-        <div class="navbar-menu">
+        <div id="navMenuGiftLock" class="navbar-menu">
             <div class="navbar-end">
-                <div class="buttons">
-                    {{ if .User }}
-                    <a href="/logout" class="navbar-item button">Logout</a>
-                    {{ else }}
-                    <a hx-get="/login" hx-target="#main-content" hx-push-url="true" class="navbar-item button">Login</a>
-                    <a hx-get="/register" hx-target="#main-content" hx-push-url="true"
-                        class="navbar-item button">Register</a>
-                    {{ end }}
+                <div class="navbar-item">
+                    <div class="buttons">
+                        {{ if .User }}
+                        <a href="/logout" class="button is-light">Logout</a>
+                        {{ else }}
+                        <a hx-get="/login" hx-target="#main-content" hx-push-url="true"
+                            class="button is-light">Login</a>
+                        <a hx-get="/register" hx-target="#main-content" hx-push-url="true"
+                            class="button is-light">Register</a>
+                        {{ end }}
+                    </div>
                 </div>
             </div>
         </div>

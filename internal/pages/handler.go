@@ -18,8 +18,8 @@ func NewHandler(p presentation.Presenter) *Handler {
 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("/", h.home)
-	mux.HandleFunc("/register", h.register)
-	mux.HandleFunc("/login", h.login)
+	mux.HandleFunc("GET /register", h.register)
+	mux.HandleFunc("GET /login", h.login)
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.HandlerFunc(staticResources)))
 	mux.HandleFunc("/favicon.ico", favicon)
 }

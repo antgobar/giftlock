@@ -2,20 +2,23 @@ package user
 
 import (
 	"context"
+	"giftlock/internal/model"
+	"giftlock/internal/presentation"
 	"log"
 	"net/http"
 	"time"
 )
 
 type Handler struct {
-	svc *Service
+	svc       *Service
+	presenter presentation.Presenter
 }
 
-func NewHandler(svc *Service) *Handler {
+func NewHandler(svc *Service, p presentation.Presenter) *Handler {
 	if svc == nil {
 		log.Fatalln("User handler is nil")
 	}
-	return &Handler{svc: svc}
+	return &Handler{svc: svc, presenter: p}
 }
 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
@@ -31,7 +34,19 @@ func (h *Handler) register(w http.ResponseWriter, r *http.Request) {
 	err := h.svc.Register(ctx, username, password)
 
 	if err == ErrUsernameTaken {
-		http.Error(w, "username taken", http.StatusConflict)
+		data := struct {
+			Error string
+			User  *model.User
+		}{
+			Error: "Username is already taken",
+			User:  nil,
+		}
+
+		if err := h.presenter.Present(w, r, "register", data); err != nil {
+			log.Println("ERROR:", err.Error())
+			http.Error(w, "template error", http.StatusInternalServerError)
+			return
+		}
 		return
 	}
 
@@ -40,5 +55,5 @@ func (h *Handler) register(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "error registering user", http.StatusInternalServerError)
 		return
 	}
-	http.Redirect(w, r, "/register", http.StatusSeeOther)
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
