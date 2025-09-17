@@ -8,15 +8,16 @@ CREATE TABLE IF NOT EXISTS users (
   created_at timestamptz DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS gifts (
+DROP TABLE IF EXISTS gifts CASCADE;
+CREATE TABLE gifts (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   title text NOT NULL,
   description text,
   link text,
   price numeric(10,2),
-  created_by uuid REFERENCES users(id) NULL, -- who added it
+  created_by uuid REFERENCES users(id) NOT NULL, -- who added it
   claimed_by uuid REFERENCES users(id) NULL, -- who claimed it (NULL if unclaimed)
-  claimed_at timestamptz NULL,
+  claimed_at timestamptz,
   created_at timestamptz DEFAULT now()
 );
 

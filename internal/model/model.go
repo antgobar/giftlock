@@ -23,3 +23,16 @@ type Session struct {
 	CreatedAt time.Time    `json:"createdAt"`
 	ExpiresAt time.Time    `json:"expiresAt"`
 }
+
+type GiftId uuid.UUID
+type Gift struct {
+	ID          GiftId     `json:"id"`
+	Title       string     `json:"title"`
+	Description string     `json:"description"`
+	Link        string     `json:"link"`
+	Price       float64    `json:"price,omitempty"`
+	CreatedBy   UserId     `json:"createdBy"`
+	ClaimedBy   *UserId    `json:"claimedBy,omitempty"`
+	ClaimedAt   *time.Time `json:"claimedAt,omitempty"`
+	CreatedAt   time.Time  `json:"createdAt"`
+}
