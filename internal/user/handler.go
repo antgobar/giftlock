@@ -2,7 +2,7 @@ package user
 
 import (
 	"context"
-	"giftlock/internal/model"
+	"errors"
 	"giftlock/internal/presentation"
 	"log"
 	"net/http"
@@ -26,24 +26,28 @@ func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 }
 
 func (h *Handler) register(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*3))
+	ctx, cancel := context.WithTimeout(r.Context(), time.Duration(time.Second*3))
 	defer cancel()
 
+	if err := r.ParseForm(); err != nil {
+		log.Println("ERROR: unable to parse form:", err)
+		http.Error(w, "invalid form data", http.StatusBadRequest)
+		return
+	}
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 	err := h.svc.Register(ctx, username, password)
 
-	if err == ErrUsernameTaken {
+	if errors.Is(err, ErrUsernameTaken) {
 		data := struct {
 			Error string
-			User  *model.User
+			User  any
 		}{
 			Error: "Username is already taken",
 			User:  nil,
 		}
-
 		if err := h.presenter.Present(w, r, "register", data); err != nil {
-			log.Println("ERROR:", err.Error())
+			log.Println("ERROR: presenting register template:", err)
 			http.Error(w, "template error", http.StatusInternalServerError)
 			return
 		}
@@ -51,7 +55,7 @@ func (h *Handler) register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		log.Println(err.Error())
+		log.Printf("ERROR: registering user '%s': %v", username, err)
 		http.Error(w, "error registering user", http.StatusInternalServerError)
 		return
 	}

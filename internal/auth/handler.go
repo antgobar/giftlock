@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"giftlock/internal/model"
 	"giftlock/internal/presentation"
 	"giftlock/internal/session"
 	"log"
@@ -36,7 +35,7 @@ func (h *Handler) logIn(w http.ResponseWriter, r *http.Request) {
 		log.Println(err.Error())
 		data := struct {
 			Error string
-			User  *model.User
+			User  any
 		}{
 			Error: "Incorrect username or password",
 			User:  nil,
