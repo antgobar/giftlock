@@ -1,0 +1,103 @@
+package middleware
+
+import (
+	"context"
+	"giftlock/internal/auth"
+	"giftlock/internal/model"
+	"giftlock/internal/session"
+	"log"
+	"net/http"
+	"strings"
+	"time"
+)
+
+type Middleware func(http.Handler) http.Handler
+
+type SessionHandler struct {
+	sessions *session.Service
+}
+
+func LoadMiddleware(s *session.Service) Middleware {
+	if s == nil {
+		return loggingMiddleware
+	}
+	h := SessionHandler{sessions: s}
+	return createMiddlewareStack(
+		loggingMiddleware,
+		h.authMiddleware,
+	)
+}
+
+func loggingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("%s %s %s", r.RemoteAddr, r.Method, r.URL)
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (h *SessionHandler) authMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		cookieVal, err := session.GetCookieValue(r)
+		if err != nil {
+			if isPublicPath(r.URL.Path) {
+				next.ServeHTTP(w, r)
+				return
+			}
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+
+		ctx, cancel := context.WithTimeout(r.Context(), 3*time.Second)
+		defer cancel()
+
+		token := model.SessionToken(cookieVal)
+
+		user, err := h.sessions.GetUserFromToken(ctx, token)
+		if user != nil {
+			log.Println("User from TOKEN", user.Username, user.CreatedAt)
+		}
+		if err != nil {
+			if isPublicPath(r.URL.Path) {
+				next.ServeHTTP(w, r)
+				return
+			}
+			log.Println(err.Error())
+			http.Error(w, "Unauthenticated", http.StatusUnauthorized)
+			return
+		}
+
+		ctx = auth.WithUser(r.Context(), user)
+
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func createMiddlewareStack(xs ...Middleware) Middleware {
+	return func(next http.Handler) http.Handler {
+		for i := len(xs) - 1; i >= 0; i-- {
+			x := xs[i]
+			next = x(next)
+		}
+		return next
+	}
+}
+
+func isPublicPath(path string) bool {
+	if path == "/" {
+		return true
+	}
+	publicPrefixes := []string{
+		"/register",
+		"/login",
+		"/logout",
+		"/static",
+		"/favicon.ico",
+	}
+	for _, publicPrefix := range publicPrefixes {
+		if strings.HasPrefix(path, publicPrefix) {
+			return true
+		}
+	}
+	return false
+}

@@ -1,0 +1,24 @@
+{{ define "navbar" }}
+<nav class="navbar">
+    <div class="container block">
+        <div class="navbar-brand">
+            <a href="/" class="navbar-item">
+                <h1 class="title">Gift Lock</h1>
+            </a>
+        </div>
+        <div class="navbar-menu">
+            <div class="navbar-end">
+                <div class="buttons">
+                    {{ if .User }}
+                    <a href="/logout" class="navbar-item button">Logout</a>
+                    {{ else }}
+                    <a hx-get="/login" hx-target="#main-content" hx-push-url="true" class="navbar-item button">Login</a>
+                    <a hx-get="/register" hx-target="#main-content" hx-push-url="true"
+                        class="navbar-item button">Register</a>
+                    {{ end }}
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+{{ end }}
