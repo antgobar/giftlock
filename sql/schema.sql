@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 DROP TABLE IF EXISTS gifts CASCADE;
-CREATE TABLE gifts (
+CREATE TABLE IF NOT EXISTS gifts (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   title text NOT NULL,
   description text,

@@ -5,6 +5,7 @@ import (
 	"giftlock/internal/auth"
 	"giftlock/internal/config"
 	"giftlock/internal/database"
+	"giftlock/internal/gift"
 	"giftlock/internal/middleware"
 	"giftlock/internal/pages"
 	"giftlock/internal/presentation"
@@ -28,14 +29,17 @@ func main() {
 
 	userRepo := user.NewPostgresRepository(db.Pool)
 	sessionRepo := session.NewPostgresRepository(db.Pool)
+	giftRepo := gift.NewPostgresRepository(db.Pool)
 
 	userService := user.NewService(userRepo)
 	sessionService := session.NewService(sessionRepo)
 	authService := auth.NewService(userRepo, sessionRepo)
+	giftService := gift.NewService(giftRepo)
 	htmlPresenter := presentation.NewHtmlPresenter()
 
 	userHandler := user.NewHandler(userService, htmlPresenter)
 	authHandler := auth.NewHandler(authService, htmlPresenter)
+	giftHandler := gift.NewHandler(giftService, htmlPresenter)
 	webPageHandler := pages.NewHandler(htmlPresenter)
 
 	middlewareStack := middleware.LoadMiddleware(sessionService)
@@ -44,6 +48,7 @@ func main() {
 		middlewareStack,
 		authHandler,
 		userHandler,
+		giftHandler,
 		webPageHandler,
 	)
 	server.Run()

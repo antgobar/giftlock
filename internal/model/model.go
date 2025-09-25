@@ -14,6 +14,15 @@ type User struct {
 	CreatedAt      time.Time `json:"createdAt"`
 }
 
+type ModelId interface {
+	UserId | SessionID | GiftId
+}
+
+func IdFromString[T ModelId](id string) (T, error) {
+	u, err := uuid.Parse(id)
+	return T(u), err
+}
+
 type SessionID uuid.UUID
 type SessionToken string
 type Session struct {

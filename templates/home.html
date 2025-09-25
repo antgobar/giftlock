@@ -4,11 +4,24 @@
         <div class="">
             <p class="title">Gift Lock</p>
             <p class="subtitle">Set up gift giving groups for friends and family</p>
+            {{ if .User }}
             <p class="subtitle">
-                {{ if .User }}
-                Welcome back, {{ .User.Username }}! .
-                {{ else }}
+                Welcome back, {{ .User.Username }}!
+            </p>
+            <form action="/group" method="POST">
+                <div class="field has-addons">
+                    <div class="control is-expanded">
+                        <input class="input" type="text" name="name" placeholder="Create a new gift group" required>
+                    </div>
+                    <div class="control">
+                        <button class="button is-primary" type="submit">Create</button>
+                    </div>
+                </div>
+            </form>
+            {{ else }}
+            <p class="subtitle">
                 Welcome to Gift Lock! Please log in or register.
+            </p>
             <div class="buttons">
                 <a href="/login" class="button is-primary">Login</a>
                 <a href="/register" class="button is-primary">Register</a>
