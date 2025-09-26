@@ -6,14 +6,23 @@ import (
 )
 
 type Config struct {
-	ServerAddr  string
-	DatabaseUrl string
+	ServerAddr     string
+	DatabaseUrl    string
+	PublicPrefixes []string
 }
 
 func Load() *Config {
 	return &Config{
 		ServerAddr:  mustLoadEnv("SERVER_ADDR"),
 		DatabaseUrl: mustLoadEnv("DATABASE_URL"),
+		PublicPrefixes: []string{
+			"/register",
+			"/login",
+			"/logout",
+			"/static",
+			"/favicon.ico",
+			"/assets",
+		},
 	}
 }
 

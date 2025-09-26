@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"giftlock/internal/auth"
+	"giftlock/internal/config"
 	"giftlock/internal/model"
 	"giftlock/internal/session"
 	"log"
@@ -14,14 +15,15 @@ import (
 type Middleware func(http.Handler) http.Handler
 
 type SessionHandler struct {
-	sessions *session.Service
+	sessions session.Repository
+	cfg      *config.Config
 }
 
-func LoadMiddleware(s *session.Service) Middleware {
+func LoadMiddleware(s session.Repository, cfg *config.Config) Middleware {
 	if s == nil {
 		return loggingMiddleware
 	}
-	h := SessionHandler{sessions: s}
+	h := SessionHandler{sessions: s, cfg: cfg}
 	return createMiddlewareStack(
 		loggingMiddleware,
 		h.authMiddleware,
@@ -40,7 +42,7 @@ func (h *SessionHandler) authMiddleware(next http.Handler) http.Handler {
 
 		cookieVal, err := session.GetCookieValue(r)
 		if err != nil {
-			if isPublicPath(r.URL.Path) {
+			if isPublicPath(r.URL.Path, h.cfg.PublicPrefixes) {
 				next.ServeHTTP(w, r)
 				return
 			}
@@ -55,7 +57,7 @@ func (h *SessionHandler) authMiddleware(next http.Handler) http.Handler {
 
 		user, err := h.sessions.GetUserFromToken(ctx, token)
 		if err != nil {
-			if isPublicPath(r.URL.Path) {
+			if isPublicPath(r.URL.Path, h.cfg.PublicPrefixes) {
 				next.ServeHTTP(w, r)
 				return
 			}
@@ -80,17 +82,9 @@ func createMiddlewareStack(xs ...Middleware) Middleware {
 	}
 }
 
-func isPublicPath(path string) bool {
+func isPublicPath(path string, publicPrefixes []string) bool {
 	if path == "/" {
 		return true
-	}
-	publicPrefixes := []string{
-		"/register",
-		"/login",
-		"/logout",
-		"/static",
-		"/favicon.ico",
-		"/assets",
 	}
 	for _, publicPrefix := range publicPrefixes {
 		if strings.HasPrefix(path, publicPrefix) {

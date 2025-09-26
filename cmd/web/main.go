@@ -32,7 +32,6 @@ func main() {
 	giftRepo := gift.NewPostgresRepository(db.Pool)
 
 	userService := user.NewService(userRepo)
-	sessionService := session.NewService(sessionRepo)
 	authService := auth.NewService(userRepo, sessionRepo)
 	giftService := gift.NewService(giftRepo)
 	htmlPresenter := presentation.NewHtmlPresenter()
@@ -42,7 +41,7 @@ func main() {
 	giftHandler := gift.NewHandler(giftService)
 	webPageHandler := pages.NewHandler(htmlPresenter)
 
-	middlewareStack := middleware.LoadMiddleware(sessionService)
+	middlewareStack := middleware.LoadMiddleware(sessionRepo, cfg)
 	server := server.NewServer(
 		cfg.ServerAddr,
 		middlewareStack,
