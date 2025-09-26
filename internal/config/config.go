@@ -22,6 +22,9 @@ func Load() *Config {
 			"/static",
 			"/favicon.ico",
 			"/assets",
+			"/api/login",
+			"/api/register",
+			"/api/logout",
 		},
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"giftlock/internal/middleware"
 	"log"
 	"net/http"
+	"strings"
 )
 
 type Server struct {
@@ -32,7 +33,13 @@ func NewServer(addr string, mw middleware.Middleware, routers ...Router) *Server
 }
 
 func (s *Server) Run() {
-	log.Printf("Starting on %s\n", s.httpServer.Addr)
+	addr := s.httpServer.Addr
+
+	if !strings.HasPrefix(addr, "http") {
+		addr = "http://" + addr
+	}
+
+	log.Printf("Starting on %s\n", addr)
 	if err := s.httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("listen: %s", err)
 	}

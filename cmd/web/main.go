@@ -8,7 +8,6 @@ import (
 	"giftlock/internal/gift"
 	"giftlock/internal/middleware"
 	"giftlock/internal/pages"
-	"giftlock/internal/presentation"
 	"giftlock/internal/server"
 	"giftlock/internal/session"
 	"giftlock/internal/user"
@@ -34,12 +33,11 @@ func main() {
 	userService := user.NewService(userRepo)
 	authService := auth.NewService(userRepo, sessionRepo)
 	giftService := gift.NewService(giftRepo)
-	htmlPresenter := presentation.NewHtmlPresenter()
 
 	userHandler := user.NewHandler(userService)
 	authHandler := auth.NewHandler(authService)
 	giftHandler := gift.NewHandler(giftService)
-	webPageHandler := pages.NewHandler(htmlPresenter)
+	webPageHandler := pages.NewHandler()
 
 	middlewareStack := middleware.LoadMiddleware(sessionRepo, cfg)
 	server := server.NewServer(
