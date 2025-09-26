@@ -19,14 +19,10 @@ type SessionHandler struct {
 
 func LoadMiddleware(s *session.Service) Middleware {
 	if s == nil {
-		return createMiddlewareStack(
-			corsMiddleware,
-			loggingMiddleware,
-		)
+		return loggingMiddleware
 	}
 	h := SessionHandler{sessions: s}
 	return createMiddlewareStack(
-		corsMiddleware,
 		loggingMiddleware,
 		h.authMiddleware,
 	)
