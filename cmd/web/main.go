@@ -37,9 +37,9 @@ func main() {
 	giftService := gift.NewService(giftRepo)
 	htmlPresenter := presentation.NewHtmlPresenter()
 
-	userHandler := user.NewHandler(userService, htmlPresenter)
-	authHandler := auth.NewHandler(authService, htmlPresenter)
-	giftHandler := gift.NewHandler(giftService, htmlPresenter)
+	userHandler := user.NewHandler(userService)
+	authHandler := auth.NewHandler(authService)
+	giftHandler := gift.NewHandler(giftService)
 	webPageHandler := pages.NewHandler(htmlPresenter)
 
 	middlewareStack := middleware.LoadMiddleware(sessionService)

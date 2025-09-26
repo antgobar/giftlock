@@ -2,62 +2,57 @@ package user
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
-	"giftlock/internal/presentation"
 	"log"
 	"net/http"
 	"time"
 )
 
 type Handler struct {
-	svc       *Service
-	presenter presentation.Presenter
+	svc *Service
 }
 
-func NewHandler(svc *Service, p presentation.Presenter) *Handler {
+func NewHandler(svc *Service) *Handler {
 	if svc == nil {
 		log.Fatalln("User handler is nil")
 	}
-	return &Handler{svc: svc, presenter: p}
+	return &Handler{svc: svc}
 }
 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /register", h.register)
 }
 
+type RegisterRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 func (h *Handler) register(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), time.Duration(time.Second*3))
 	defer cancel()
 
-	if err := r.ParseForm(); err != nil {
-		log.Println("ERROR: unable to parse form:", err)
-		http.Error(w, "invalid form data", http.StatusBadRequest)
+	var req RegisterRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Println("ERROR: unable to parse JSON:", err)
+		http.Error(w, "invalid JSON data", http.StatusBadRequest)
 		return
 	}
-	username := r.FormValue("username")
-	password := r.FormValue("password")
-	err := h.svc.Register(ctx, username, password)
+
+	err := h.svc.Register(ctx, req.Username, req.Password)
 
 	if errors.Is(err, ErrUsernameTaken) {
-		data := struct {
-			Error string
-			User  any
-		}{
-			Error: "Username is already taken",
-			User:  nil,
-		}
-		if err := h.presenter.Present(w, r, "register", data); err != nil {
-			log.Println("ERROR: presenting register template:", err)
-			http.Error(w, "template error", http.StatusInternalServerError)
-			return
-		}
+		http.Error(w, "username taken", http.StatusConflict)
 		return
 	}
 
 	if err != nil {
-		log.Printf("ERROR: registering user '%s': %v", username, err)
-		http.Error(w, "error registering user", http.StatusInternalServerError)
+		log.Printf("ERROR: registering user '%s': %v", req.Username, err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
-	http.Redirect(w, r, "/login", http.StatusSeeOther)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
 }

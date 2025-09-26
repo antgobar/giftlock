@@ -19,10 +19,14 @@ type SessionHandler struct {
 
 func LoadMiddleware(s *session.Service) Middleware {
 	if s == nil {
-		return loggingMiddleware
+		return createMiddlewareStack(
+			corsMiddleware,
+			loggingMiddleware,
+		)
 	}
 	h := SessionHandler{sessions: s}
 	return createMiddlewareStack(
+		corsMiddleware,
 		loggingMiddleware,
 		h.authMiddleware,
 	)
@@ -44,7 +48,7 @@ func (h *SessionHandler) authMiddleware(next http.Handler) http.Handler {
 				next.ServeHTTP(w, r)
 				return
 			}
-			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			http.Error(w, "Unauthenticated", http.StatusUnauthorized)
 			return
 		}
 
@@ -54,9 +58,6 @@ func (h *SessionHandler) authMiddleware(next http.Handler) http.Handler {
 		token := model.SessionToken(cookieVal)
 
 		user, err := h.sessions.GetUserFromToken(ctx, token)
-		if user != nil {
-			log.Println("User from TOKEN", user.Username, user.CreatedAt)
-		}
 		if err != nil {
 			if isPublicPath(r.URL.Path) {
 				next.ServeHTTP(w, r)
@@ -93,6 +94,7 @@ func isPublicPath(path string) bool {
 		"/logout",
 		"/static",
 		"/favicon.ico",
+		"/assets",
 	}
 	for _, publicPrefix := range publicPrefixes {
 		if strings.HasPrefix(path, publicPrefix) {

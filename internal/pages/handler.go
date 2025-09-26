@@ -1,8 +1,6 @@
 package pages
 
 import (
-	"giftlock/internal/auth"
-	"giftlock/internal/model"
 	"giftlock/internal/presentation"
 	"log"
 	"net/http"
@@ -21,6 +19,7 @@ func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /register", h.register)
 	mux.HandleFunc("GET /login", h.login)
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.HandlerFunc(staticResources)))
+	mux.Handle("GET /assets/", http.StripPrefix("/assets/", http.HandlerFunc(frontendAssets)))
 	mux.HandleFunc("/favicon.ico", favicon)
 }
 
@@ -29,21 +28,7 @@ func (h *Handler) home(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-
-	user, _ := auth.UserFromContext(r.Context())
-
-	data := struct {
-		User *model.User
-	}{
-		User: user,
-	}
-	if user != nil {
-		log.Println("User in context", user.Username, user.CreatedAt)
-	}
-	if err := h.presenter.Present(w, r, "home", data); err != nil {
-		log.Println("ERROR:", err.Error())
-		http.Error(w, "template error", http.StatusInternalServerError)
-	}
+	http.ServeFile(w, r, "frontend/dist/index.html")
 }
 
 func (h *Handler) login(w http.ResponseWriter, r *http.Request) {
@@ -67,5 +52,11 @@ func staticResources(w http.ResponseWriter, r *http.Request) {
 }
 
 func favicon(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "/static/favicon.ico", http.StatusMovedPermanently)
+	http.ServeFile(w, r, "frontend/dist/favicon.ico")
+}
+
+func frontendAssets(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "public, max-age=31536000")
+	fs := http.FileServer(http.Dir("frontend/dist/assets"))
+	fs.ServeHTTP(w, r)
 }
