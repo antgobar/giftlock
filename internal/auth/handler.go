@@ -58,6 +58,7 @@ func (h *Handler) logOut(w http.ResponseWriter, r *http.Request) {
 
 	user, ok := UserFromContext(r.Context())
 	if !ok {
+		session.ClearCookie(w)
 		w.WriteHeader(http.StatusOK)
 		return
 	}
@@ -66,6 +67,8 @@ func (h *Handler) logOut(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("Error logging out:", err.Error())
 	}
+
+	session.ClearCookie(w)
 	w.WriteHeader(http.StatusOK)
 }
 

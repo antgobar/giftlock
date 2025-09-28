@@ -106,10 +106,8 @@ const handleLogin = async () => {
       credentials.username = ''
       credentials.password = ''
       
-      // Redirect to dashboard
-      setTimeout(() => {
-        router.push('/dashboard')
-      }, 1000) // Small delay to show success message
+      // Redirect to dashboard immediately
+      router.push('/dashboard')
     }
   } catch (error) {
     console.error('Login error:', error)

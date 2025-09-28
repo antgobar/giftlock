@@ -5,8 +5,8 @@
         <div class="column is-4">
           <div class="box">
             <h2 class="title is-3 has-text-centered">Create Account</h2>
-      
-      <form @submit.prevent="handleRegister">
+            
+            <form @submit.prevent="handleRegister">
         <div class="field">
           <label class="label" for="username">Username</label>
           <div class="control">
@@ -57,26 +57,20 @@
         
         <div class="field">
           <div class="control">
-            <button class="button is-primary is-fullwidth" type="submit" :disabled="isLoading || !isFormValid">
-              <span v-if="isLoading">
-                <i class="fas fa-spinner fa-spin"></i>
-                Creating Account...
-              </span>
-              <span v-else>
-                Create Account
-              </span>
+            <button class="button is-primary is-fullwidth" type="submit" :class="{ 'is-loading': isLoading }" :disabled="isLoading">
+              Create Account
             </button>
           </div>
         </div>
       </form>
 
-      <div class="notification is-danger" v-if="errorMessage">
-        {{ errorMessage }}
-      </div>
+            <div class="notification is-danger" v-if="errorMessage">
+              {{ errorMessage }}
+            </div>
 
-      <div class="notification is-success" v-if="successMessage">
-        {{ successMessage }}
-      </div>
+            <div class="notification is-success" v-if="successMessage">
+              {{ successMessage }}
+            </div>
 
             <div class="has-text-centered mt-4">
               <p>Already have an account? 
@@ -114,12 +108,10 @@ const errorMessage = ref('')
 const successMessage = ref('')
 
 const isFormValid = computed(() => {
-  return credentials.username.trim() !== '' &&
-         credentials.password.trim() !== '' &&
+  return credentials.username.trim().length >= 3 &&
+         credentials.password.trim().length >= 6 &&
          credentials.confirmPassword.trim() !== '' &&
-         credentials.password === credentials.confirmPassword &&
-         credentials.username.length >= 3 &&
-         credentials.password.length >= 6
+         credentials.password === credentials.confirmPassword
 })
 
 const validateForm = () => {

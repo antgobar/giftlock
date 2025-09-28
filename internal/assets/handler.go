@@ -2,6 +2,7 @@ package assets
 
 import (
 	"net/http"
+	"strings"
 )
 
 type Handler struct{}
@@ -17,11 +18,12 @@ func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 }
 
 func (h *Handler) home(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		http.NotFound(w, r)
+	// For SPA routing, serve index.html for all non-API routes
+	if r.URL.Path == "/" || (!strings.HasPrefix(r.URL.Path, "/api/") && !strings.HasPrefix(r.URL.Path, "/assets/") && r.URL.Path != "/favicon.ico") {
+		http.ServeFile(w, r, "frontend/dist/index.html")
 		return
 	}
-	http.ServeFile(w, r, "frontend/dist/index.html")
+	http.NotFound(w, r)
 }
 
 func favicon(w http.ResponseWriter, r *http.Request) {
