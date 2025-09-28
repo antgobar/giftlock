@@ -14,8 +14,17 @@ type User struct {
 	CreatedAt      time.Time `json:"createdAt"`
 }
 
+type GroupId uuid.UUID
+type Group struct {
+	ID          GroupId   `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	CreatedBy   UserId    `json:"createdBy"`
+	CreatedAt   time.Time `json:"createdAt"`
+}
+
 type ModelId interface {
-	UserId | SessionID | GiftId
+	UserId | SessionID | GiftId | GroupId
 }
 
 func IdFromString[T ModelId](id string) (T, error) {

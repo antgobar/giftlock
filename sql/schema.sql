@@ -8,20 +8,33 @@ CREATE TABLE IF NOT EXISTS users (
   created_at timestamptz DEFAULT now()
 );
 
-DROP TABLE IF EXISTS gifts CASCADE;
+CREATE TABLE IF NOT EXISTS groups (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  description TEXT,
+  created_by uuid REFERENCES users(id) NOT NULL,
+  created_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS group_members (
+  user_id uuid REFERENCES users(id) ON DELETE CASCADE,
+  group_id uuid REFERENCES groups(id) ON DELETE CASCADE,
+  joined_at timestamptz DEFAULT now(),
+  PRIMARY KEY (user_id, group_id)
+);
+
 CREATE TABLE IF NOT EXISTS gifts (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   title text NOT NULL,
   description text,
   link text,
-  price numeric(10,2),
-  created_by uuid REFERENCES users(id) NOT NULL, -- who added it
-  claimed_by uuid REFERENCES users(id) NULL, -- who claimed it (NULL if unclaimed)
+  group_id uuid REFERENCES groups(id) NOT NULL,
+  created_by uuid REFERENCES users(id) NOT NULL,
+  claimed_by uuid REFERENCES users(id) NULL,
   claimed_at timestamptz,
   created_at timestamptz DEFAULT now()
 );
 
--- session table
 CREATE TABLE IF NOT EXISTS sessions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid REFERENCES users(id) NOT NULL,
