@@ -16,15 +16,12 @@ func Load() *Config {
 		ServerAddr:  mustLoadEnv("SERVER_ADDR"),
 		DatabaseUrl: mustLoadEnv("DATABASE_URL"),
 		PublicPrefixes: []string{
-			"/register",
-			"/login",
-			"/logout",
-			"/static",
 			"/favicon.ico",
 			"/assets",
 			"/api/login",
 			"/api/register",
 			"/api/logout",
+			"/api/me",
 		},
 	}
 }

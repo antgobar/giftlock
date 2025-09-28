@@ -1,7 +1,6 @@
 <template>
-  <div class="dashboard-container">
+  <section class="section">
     <div class="container">
-      <div class="section">
         <div class="columns is-centered">
           <div class="column is-8">
             <div class="card">
@@ -44,8 +43,7 @@
           </div>
         </div>
       </div>
-    </div>
-  </div>
+  </section>
 </template>
 
 <script setup>
@@ -56,14 +54,3 @@ const router = useRouter()
 // Logout is now handled by the navbar component
 </script>
 
-<style scoped>
-.dashboard-container {
-  min-height: calc(100vh - 52px); /* Account for navbar height */
-  background-color: #f5f5f5;
-  padding-top: 2rem;
-}
-
-.card {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-</style>

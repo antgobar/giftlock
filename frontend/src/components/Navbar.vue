@@ -112,23 +112,3 @@ defineExpose({
   updateAuthStatus: checkAuthStatus
 })
 </script>
-
-<style scoped>
-.navbar {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.navbar-brand .navbar-item {
-  font-size: 1.25rem;
-}
-
-.navbar-item.router-link-active:not(.button) {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-@media screen and (max-width: 1023px) {
-  .navbar-menu {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  }
-}
-</style>

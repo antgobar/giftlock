@@ -1,7 +1,10 @@
 <template>
-  <div class="register-container">
-    <div class="register-form">
-      <h2 class="title is-3">Create Account</h2>
+  <section class="section">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-4">
+          <div class="box">
+            <h2 class="title is-3 has-text-centered">Create Account</h2>
       
       <form @submit.prevent="handleRegister">
         <div class="field">
@@ -75,13 +78,16 @@
         {{ successMessage }}
       </div>
 
-      <div class="has-text-centered mt-4">
-        <p>Already have an account? 
-          <router-link to="/login" class="has-text-primary">Sign in here</router-link>
-        </p>
+            <div class="has-text-centered mt-4">
+              <p>Already have an account? 
+                <router-link to="/login" class="has-text-primary">Sign in here</router-link>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup>
@@ -210,32 +216,3 @@ const handleRegister = async () => {
 }
 </script>
 
-<style scoped>
-.register-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: calc(100vh - 52px); /* Account for navbar height */
-  background-color: #f5f5f5;
-  padding: 1rem;
-}
-
-.register-form {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
-}
-
-.title {
-  text-align: center;
-  margin-bottom: 1.5rem !important;
-  color: #333;
-}
-
-.field:not(:last-child) {
-  margin-bottom: 1rem;
-}
-</style>
