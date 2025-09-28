@@ -1,44 +1,66 @@
 <template>
   <div class="login-container">
     <div class="login-form">
-      <h2>Login</h2>
+      <h2 class="title is-3">Sign In</h2>
       
       <form @submit.prevent="handleLogin">
-        <div class="form-group">
-          <label for="username">Username:</label>
-          <input
-            type="text"
-            id="username"
-            v-model="credentials.username"
-            required
-            :disabled="isLoading"
-          />
+        <div class="field">
+          <label class="label" for="username">Username</label>
+          <div class="control">
+            <input
+              class="input"
+              type="text"
+              id="username"
+              v-model="credentials.username"
+              required
+              :disabled="isLoading"
+              placeholder="Enter your username"
+            />
+          </div>
         </div>
         
-        <div class="form-group">
-          <label for="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            v-model="credentials.password"
-            required
-            :disabled="isLoading"
-          />
+        <div class="field">
+          <label class="label" for="password">Password</label>
+          <div class="control">
+            <input
+              class="input"
+              type="password"
+              id="password"
+              v-model="credentials.password"
+              required
+              :disabled="isLoading"
+              placeholder="Enter your password"
+            />
+          </div>
         </div>
         
-        <div class="form-group">
-          <button type="submit" :disabled="isLoading">
-            {{ isLoading ? 'Logging in...' : 'Login' }}
-          </button>
+        <div class="field">
+          <div class="control">
+            <button class="button is-primary is-fullwidth" type="submit" :disabled="isLoading">
+              <span v-if="isLoading">
+                <i class="fas fa-spinner fa-spin"></i>
+                Signing in...
+              </span>
+              <span v-else>
+                Sign In
+              </span>
+            </button>
+          </div>
         </div>
       </form>
       
-      <div v-if="errorMessage" class="error-message">
+      <div class="notification is-danger" v-if="errorMessage">
         {{ errorMessage }}
       </div>
       
-      <div v-if="successMessage" class="success-message">
+      <div class="notification is-success" v-if="successMessage">
         {{ successMessage }}
+      </div>
+
+      <div class="has-text-centered mt-4">
+        <p>Don't have an account? 
+          <router-link to="/register" class="has-text-primary">Sign up here</router-link>
+        </p>
       </div>
     </div>
   </div>
@@ -113,8 +135,9 @@ const handleLogin = async () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  min-height: calc(100vh - 52px); /* Account for navbar height */
   background-color: #f5f5f5;
+  padding: 1rem;
 }
 
 .login-form {
@@ -126,81 +149,13 @@ const handleLogin = async () => {
   max-width: 400px;
 }
 
-.login-form h2 {
+.title {
   text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.5rem !important;
   color: #333;
 }
 
-.form-group {
+.field:not(:last-child) {
   margin-bottom: 1rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: bold;
-  color: #555;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
-  box-sizing: border-box;
-}
-
-.form-group input:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
-.form-group input:disabled {
-  background-color: #f8f9fa;
-  cursor: not-allowed;
-}
-
-.form-group button {
-  width: 100%;
-  padding: 0.75rem;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.form-group button:hover:not(:disabled) {
-  background-color: #0056b3;
-}
-
-.form-group button:disabled {
-  background-color: #6c757d;
-  cursor: not-allowed;
-}
-
-.error-message {
-  margin-top: 1rem;
-  padding: 0.75rem;
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-  border-radius: 4px;
-  text-align: center;
-}
-
-.success-message {
-  margin-top: 1rem;
-  padding: 0.75rem;
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-  border-radius: 4px;
-  text-align: center;
 }
 </style>

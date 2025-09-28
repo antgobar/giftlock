@@ -21,7 +21,7 @@ func NewHandler(svc *Service) *Handler {
 }
 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("POST /register", h.register)
+	mux.HandleFunc("POST /api/register", h.register)
 }
 
 type RegisterRequest struct {

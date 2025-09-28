@@ -1,9 +1,10 @@
 <script setup>
-// No imports needed for router-view
+import Navbar from './components/Navbar.vue';
 </script>
 
 <template>
   <div id="app">
+    <Navbar />
     <router-view />
   </div>
 </template>

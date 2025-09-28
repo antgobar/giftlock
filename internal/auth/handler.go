@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"encoding/json"
+	"giftlock/internal/model"
 	"giftlock/internal/session"
 	"log"
 	"net/http"
@@ -21,6 +22,7 @@ func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /api/login", h.logIn)
 	mux.HandleFunc("POST /api/logout", h.logOut)
 	mux.HandleFunc("GET /api/logout", h.logOut)
+	mux.HandleFunc("GET /api/me", h.me)
 }
 
 type loginRequest struct {
@@ -65,4 +67,29 @@ func (h *Handler) logOut(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error logging out:", err.Error())
 	}
 	w.WriteHeader(http.StatusOK)
+}
+
+type meResponse struct {
+	Username string       `json:"username"`
+	ID       model.UserId `json:"id"`
+}
+
+func (h *Handler) me(w http.ResponseWriter, r *http.Request) {
+	user, ok := UserFromContext(r.Context())
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	response := meResponse{
+		Username: user.Username,
+		ID:       user.ID,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		log.Printf("Error encoding user info: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
 }
