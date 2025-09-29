@@ -1,16 +1,15 @@
-<script setup>
-import Navbar from './components/Navbar.vue';
-</script>
-
 <template>
-  <div id="app">
-    <Navbar />
-    <router-view />
+  <div class="container">
+    <h1 class="title">Gift Lock</h1>
+    <router-view></router-view>
   </div>
 </template>
 
-<style scoped>
-#app {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-}
+<script>
+export default {
+  name: "App",
+};
+</script>
+
+<style>
 </style>

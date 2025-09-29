@@ -17,6 +17,7 @@ func Load() *Config {
 		DatabaseUrl: mustLoadEnv("DATABASE_URL"),
 		PublicPrefixes: []string{
 			"/favicon.ico",
+			"/bulma.min.css",
 			"/assets",
 			"/api/login",
 			"/api/register",
