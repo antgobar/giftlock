@@ -48,25 +48,33 @@ func (s *PostgresRepo) Delete(ctx context.Context, groupID model.GroupId) error 
 	return err
 }
 
-func (s *PostgresRepo) GetByID(ctx context.Context, groupID model.GroupId) (*model.Group, error) {
+func (s *PostgresRepo) ListCreated(ctx context.Context, userID model.UserId) ([]*model.Group, error) {
 	sql := `
 		SELECT id, name, description, created_by, created_at
 		FROM groups
-		WHERE id = $1;
+		WHERE created_by = $1;
 	`
-	row := s.db.QueryRow(ctx, sql, groupID)
-	var group model.Group
-	err := row.Scan(
-		&group.ID,
-		&group.Name,
-		&group.Description,
-		&group.CreatedBy,
-		&group.CreatedAt,
-	)
+	rows, err := s.db.Query(ctx, sql, userID)
 	if err != nil {
 		return nil, err
 	}
-	return &group, nil
+	defer rows.Close()
+
+	var groups []*model.Group
+	for rows.Next() {
+		var group model.Group
+		if err := rows.Scan(
+			&group.ID,
+			&group.Name,
+			&group.Description,
+			&group.CreatedBy,
+			&group.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		groups = append(groups, &group)
+	}
+	return groups, nil
 }
 
 func (s *PostgresRepo) Join(ctx context.Context, userID model.UserId, groupID model.GroupId) error {

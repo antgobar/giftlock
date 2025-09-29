@@ -33,8 +33,8 @@ func (s *Service) DeleteGroup(ctx context.Context, groupID model.GroupId) error 
 	return s.repo.Delete(ctx, groupID)
 }
 
-func (s *Service) GetGroupByID(ctx context.Context, groupID model.GroupId) (*model.Group, error) {
-	return s.repo.GetByID(ctx, groupID)
+func (s *Service) GetCreatedGroups(ctx context.Context, userID model.UserId) ([]*model.Group, error) {
+	return s.repo.ListCreated(ctx, userID)
 }
 
 func (s *Service) JoinGroup(ctx context.Context, userID model.UserId, groupID model.GroupId) error {

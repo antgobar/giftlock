@@ -22,6 +22,7 @@ func NewHandler(svc *Service) *Handler {
 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /api/groups", h.createGroup)
+	mux.HandleFunc("GET /api/groups", h.getCreatedGroups)
 }
 
 func (h *Handler) createGroup(w http.ResponseWriter, r *http.Request) {
@@ -58,6 +59,32 @@ func (h *Handler) createGroup(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(group); err != nil {
+		log.Println("ERROR: unable to encode response:", err)
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		return
+	}
+}
+
+func (h *Handler) getCreatedGroups(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), time.Duration(time.Second*3))
+	defer cancel()
+
+	user, ok := auth.UserFromContext(r.Context())
+	if !ok {
+		log.Println("ERROR:", "no user in context")
+		http.Error(w, "Error getting user", http.StatusUnauthorized)
+		return
+	}
+
+	groups, err := h.svc.GetCreatedGroups(ctx, user.ID)
+	if err != nil {
+		log.Println("ERROR:", err.Error())
+		http.Error(w, "Error fetching groups", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(groups); err != nil {
 		log.Println("ERROR: unable to encode response:", err)
 		http.Error(w, "Error encoding response", http.StatusInternalServerError)
 		return
