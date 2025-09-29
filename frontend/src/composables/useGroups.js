@@ -76,11 +76,39 @@ export function useGroups() {
         }
     };
 
+    // Delete a group
+    const deleteGroup = async (groupId) => {
+        if (!groupId) {
+            throw new Error('Group ID is required');
+        }
+
+        try {
+            const response = await fetch(`/api/groups/${groupId}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || `HTTP error! status: ${response.status}`);
+            }
+
+            // Remove the deleted group from the local state
+            groups.value = groups.value.filter(group => group.id !== groupId);
+
+            return true;
+        } catch (err) {
+            console.error('Error deleting group:', err);
+            throw err;
+        }
+    };
+
     return {
         groups,
         isLoading,
         error,
         fetchGroups,
-        createGroup
+        createGroup,
+        deleteGroup
     };
 }

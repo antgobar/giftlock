@@ -5,8 +5,10 @@
       <div class="column is-half" v-for="group in groups" :key="group.id">
         <GroupCard 
           :group="group"
+          :is-deleting="deletingGroupId === group.id"
           @view-gifts="$emit('view-gifts', $event)"
           @manage-group="$emit('manage-group', $event)"
+          @delete-group="$emit('delete-group', $event)"
         />
       </div>
     </div>
@@ -35,8 +37,12 @@ const props = defineProps({
   isLoading: {
     type: Boolean,
     default: false
+  },
+  deletingGroupId: {
+    type: String,
+    default: null
   }
 });
 
-const emit = defineEmits(['view-gifts', 'manage-group']);
+const emit = defineEmits(['view-gifts', 'manage-group', 'delete-group']);
 </script>

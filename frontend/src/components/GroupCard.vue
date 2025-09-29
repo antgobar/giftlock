@@ -22,6 +22,14 @@
           >
             Manage
           </button>
+          <button 
+            class="button is-small is-danger"
+            @click="$emit('delete-group', group)"
+            :disabled="isDeleting"
+          >
+            <span v-if="isDeleting">Deleting...</span>
+            <span v-else>Delete</span>
+          </button>
         </div>
       </div>
     </div>
@@ -33,10 +41,14 @@ const props = defineProps({
   group: {
     type: Object,
     required: true
+  },
+  isDeleting: {
+    type: Boolean,
+    default: false
   }
 });
 
-const emit = defineEmits(['view-gifts', 'manage-group']);
+const emit = defineEmits(['view-gifts', 'manage-group', 'delete-group']);
 
 // Format date for display
 const formatDate = (dateString) => {
