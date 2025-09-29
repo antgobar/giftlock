@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"giftlock/internal/auth"
+	"giftlock/internal/model"
 	"log"
 	"net/http"
 	"time"
@@ -23,6 +24,7 @@ func NewHandler(svc *Service) *Handler {
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /api/groups", h.createGroup)
 	mux.HandleFunc("GET /api/groups", h.getCreatedGroups)
+	mux.HandleFunc("DELETE /api/groups/{id}", h.deleteOwnGroup)
 }
 
 type groupCreateRequest struct {
@@ -105,4 +107,31 @@ func (h *Handler) getCreatedGroups(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error encoding response", http.StatusInternalServerError)
 		return
 	}
+}
+
+func (h *Handler) deleteOwnGroup(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), time.Duration(time.Second*3))
+	defer cancel()
+
+	user, ok := auth.UserFromContext(r.Context())
+	if !ok {
+		log.Println("ERROR:", "no user in context")
+		http.Error(w, "Error getting user", http.StatusUnauthorized)
+		return
+	}
+
+	groupId, err := model.IdFromString[model.GroupId](r.PathValue("id"))
+	if err != nil {
+		log.Println("ERROR: invalid user id", err)
+		http.Error(w, "Invalid group id", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.svc.DeleteGroup(ctx, user.ID, groupId); err != nil {
+		log.Println("ERROR:", err.Error())
+		http.Error(w, "Error deleting group", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusAccepted)
 }

@@ -29,8 +29,8 @@ func (s *Service) CreateAndJoinGroup(ctx context.Context, userID model.UserId, n
 	return createdGroup, nil
 }
 
-func (s *Service) DeleteGroup(ctx context.Context, groupID model.GroupId) error {
-	return s.repo.Delete(ctx, groupID)
+func (s *Service) DeleteGroup(ctx context.Context, userId model.UserId, groupID model.GroupId) error {
+	return s.repo.Delete(ctx, userId, groupID)
 }
 
 func (s *Service) GetCreatedGroups(ctx context.Context, userID model.UserId) ([]*model.Group, error) {
