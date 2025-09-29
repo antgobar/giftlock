@@ -25,6 +25,11 @@ func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /api/groups", h.getCreatedGroups)
 }
 
+type groupCreateRequest struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
+
 func (h *Handler) createGroup(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), time.Duration(time.Second*3))
 	defer cancel()
@@ -36,21 +41,32 @@ func (h *Handler) createGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := r.ParseForm(); err != nil {
-		log.Println("ERROR: unable to parse form:", err)
-		http.Error(w, "invalid form data", http.StatusBadRequest)
+	var req groupCreateRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Println("ERROR: unable to parse JSON:", err)
+		http.Error(w, "invalid JSON data", http.StatusBadRequest)
 		return
 	}
 
-	groupName := r.FormValue("name")
-	if groupName == "" {
+	if req.Name == "" {
 		log.Println("ERROR: missing group name")
 		http.Error(w, "group name required", http.StatusBadRequest)
 		return
 	}
-	groupDescription := r.FormValue("description")
 
-	group, err := h.svc.CreateAndJoinGroup(ctx, user.ID, groupName, groupDescription)
+	if len(req.Name) > 255 {
+		log.Println("ERROR: group name too long")
+		http.Error(w, "group name must be 255 characters or less", http.StatusBadRequest)
+		return
+	}
+
+	if len(req.Description) > 1000 {
+		log.Println("ERROR: group description too long")
+		http.Error(w, "group description must be 1000 characters or less", http.StatusBadRequest)
+		return
+	}
+
+	group, err := h.svc.CreateAndJoinGroup(ctx, user.ID, req.Name, req.Description)
 	if err != nil {
 		log.Println("ERROR:", err.Error())
 		http.Error(w, "Error creating group", http.StatusInternalServerError)
