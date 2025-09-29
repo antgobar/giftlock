@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/google/uuid"
@@ -53,4 +54,75 @@ type Gift struct {
 	ClaimedBy   *UserId    `json:"claimedBy,omitempty"`
 	ClaimedAt   *time.Time `json:"claimedAt,omitempty"`
 	CreatedAt   time.Time  `json:"createdAt"`
+}
+
+// Generic UUID marshaling helpers
+func marshalUUID[T ModelId](id T) ([]byte, error) {
+	return json.Marshal(uuid.UUID(id).String())
+}
+
+func unmarshalUUID[T ModelId](data []byte) (T, error) {
+	var str string
+	if err := json.Unmarshal(data, &str); err != nil {
+		var zero T
+		return zero, err
+	}
+	parsed, err := uuid.Parse(str)
+	if err != nil {
+		var zero T
+		return zero, err
+	}
+	return T(parsed), nil
+}
+
+func (u UserId) MarshalJSON() ([]byte, error) {
+	return marshalUUID(u)
+}
+
+func (u *UserId) UnmarshalJSON(data []byte) error {
+	parsed, err := unmarshalUUID[UserId](data)
+	if err != nil {
+		return err
+	}
+	*u = parsed
+	return nil
+}
+
+func (g GroupId) MarshalJSON() ([]byte, error) {
+	return marshalUUID(g)
+}
+
+func (g *GroupId) UnmarshalJSON(data []byte) error {
+	parsed, err := unmarshalUUID[GroupId](data)
+	if err != nil {
+		return err
+	}
+	*g = parsed
+	return nil
+}
+
+func (g GiftId) MarshalJSON() ([]byte, error) {
+	return marshalUUID(g)
+}
+
+func (g *GiftId) UnmarshalJSON(data []byte) error {
+	parsed, err := unmarshalUUID[GiftId](data)
+	if err != nil {
+		return err
+	}
+	*g = parsed
+	return nil
+}
+
+func (s SessionID) MarshalJSON() ([]byte, error) {
+	return marshalUUID(s)
+}
+
+func (s *SessionID) UnmarshalJSON(data []byte) error {
+	parsed, err := unmarshalUUID[SessionID](data)
+	if err != nil {
+		return err
+	}
+	*s = parsed
+	return nil
 }
