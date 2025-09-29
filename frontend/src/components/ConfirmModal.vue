@@ -1,7 +1,7 @@
 <template>
   <div class="modal" :class="{ 'is-active': isActive }">
     <div class="modal-background" @click="$emit('cancel')"></div>
-    <div class="modal-card">
+    <div class="modal-card is-small">
       <header class="modal-card-head">
         <p class="modal-card-title">{{ title }}</p>
         <button class="delete" aria-label="close" @click="$emit('cancel')"></button>

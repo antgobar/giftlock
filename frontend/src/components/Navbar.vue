@@ -9,13 +9,28 @@
           <span class="title is-5 has-text-white">Gift Lock</span>
         </span>
       </router-link>
+
+      <a 
+        role="button" 
+        class="navbar-burger"
+        :class="{ 'is-active': isBurgerActive }"
+        aria-label="menu" 
+        :aria-expanded="isBurgerActive"
+        data-target="navbarBasicExample"
+        @click="toggleBurger"
+      >
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
     </div>
 
-    <div class="navbar-menu is-active">
+    <div class="navbar-menu" :class="{ 'is-active': isBurgerActive }" id="navbarBasicExample">
       <div class="navbar-end">
         <!-- Unauthenticated user buttons -->
         <template v-if="!isAuthenticated">
-          <router-link to="/login" class="navbar-item">
+          <router-link to="/login" class="navbar-item" @click="closeBurger">
             <span class="icon-text">
               <span class="icon">
                 <i class="fas fa-sign-in-alt"></i>
@@ -23,7 +38,7 @@
               <span>Login</span>
             </span>
           </router-link>
-          <router-link to="/register" class="navbar-item">
+          <router-link to="/register" class="navbar-item" @click="closeBurger">
             <span class="icon-text">
               <span class="icon">
                 <i class="fas fa-user-plus"></i>
@@ -35,7 +50,7 @@
         
         <!-- Authenticated user items -->
         <template v-if="isAuthenticated">
-          <router-link to="/dashboard" class="navbar-item">
+          <router-link to="/dashboard" class="navbar-item" @click="closeBurger">
             <span class="icon-text">
               <span class="icon">
                 <i class="fas fa-tachometer-alt"></i>
@@ -65,6 +80,15 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const isAuthenticated = ref(false)
 const username = ref('')
+const isBurgerActive = ref(false)
+
+const toggleBurger = () => {
+  isBurgerActive.value = !isBurgerActive.value
+}
+
+const closeBurger = () => {
+  isBurgerActive.value = false
+}
 
 const checkAuthStatus = async () => {
   try {
@@ -87,6 +111,7 @@ const handleLogout = async () => {
   } finally {
     isAuthenticated.value = false
     username.value = ''
+    closeBurger() // Close burger menu after logout
     router.push('/')
   }
 }
@@ -99,6 +124,7 @@ onMounted(() => {
 // Listen for route changes to update auth status
 router.afterEach(() => {
   checkAuthStatus()
+  closeBurger() // Close burger menu when route changes
 })
 
 // Export functions for parent components to use
