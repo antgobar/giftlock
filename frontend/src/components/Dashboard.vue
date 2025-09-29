@@ -5,31 +5,23 @@
         <div class="column is-8">
           <div class="box">
             <h1 class="title is-2 has-text-centered">Welcome to Gift Lock!</h1>
-            <p class="subtitle is-4 has-text-centered">You have successfully logged in.</p>
-            
-            <div class="content">
-              <p>This is your dashboard where you can:</p>
-              <ul>
-                <li>Create and manage gift exchange groups</li>
-                <li>Add gifts to your wishlist</li>
-                <li>View upcoming gift exchange events</li>
-                <li>Manage your account settings</li>
-              </ul>
-            </div>
 
             <div class="buttons is-centered">
-              <button class="button is-primary is-large">
-                <span class="icon">
-                  <i class="fas fa-users"></i>
-                </span>
-                <span>Create Group</span>
-              </button>
+              <form action="">
+                <div class="field has-addons">
+                  <div class="control">
+                    <input class="input" type="text" placeholder="Create a new gift group" />
+                  </div>
+                  <div class="control">
+                    <button class="button is-primary">
+                      Create
+                    </button>
+                  </div>
+                </div>
+              </form>
               
-              <button class="button is-info is-large">
-                <span class="icon">
-                  <i class="fas fa-list"></i>
-                </span>
-                <span>My Gifts</span>
+              <button class="button is-info">
+                My Gifts
               </button>
             </div>
           </div>
@@ -44,6 +36,5 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter()
 
-// Logout is now handled by the navbar component
 </script>
 

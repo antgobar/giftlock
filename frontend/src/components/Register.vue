@@ -7,62 +7,62 @@
             <h2 class="title is-3 has-text-centered">Create Account</h2>
             
             <form @submit.prevent="handleRegister">
-        <div class="field">
-          <label class="label" for="username">Username</label>
-          <div class="control">
-            <input
-              class="input"
-              :class="{ 'is-danger': errors.username }"
-              type="text"
-              id="username"
-              v-model="credentials.username"
-              :disabled="isLoading"
-              placeholder="Enter your username"
-            />
-          </div>
-          <p class="help is-danger" v-if="errors.username">{{ errors.username }}</p>
-        </div>
-        
-        <div class="field">
-          <label class="label" for="password">Password</label>
-          <div class="control">
-            <input
-              class="input"
-              :class="{ 'is-danger': errors.password }"
-              type="password"
-              id="password"
-              v-model="credentials.password"
-              :disabled="isLoading"
-              placeholder="Enter your password"
-            />
-          </div>
-          <p class="help is-danger" v-if="errors.password">{{ errors.password }}</p>
-        </div>
+              <div class="field">
+                <label class="label" for="username">Username</label>
+                <div class="control">
+                  <input
+                    class="input"
+                    :class="{ 'is-danger': errors.username }"
+                    type="text"
+                    id="username"
+                    v-model="credentials.username"
+                    :disabled="isLoading"
+                    placeholder="Enter your username"
+                  />
+                </div>
+                <p class="help is-danger" v-if="errors.username">{{ errors.username }}</p>
+              </div>
+              
+              <div class="field">
+                <label class="label" for="password">Password</label>
+                <div class="control">
+                  <input
+                    class="input"
+                    :class="{ 'is-danger': errors.password }"
+                    type="password"
+                    id="password"
+                    v-model="credentials.password"
+                    :disabled="isLoading"
+                    placeholder="Enter your password"
+                  />
+                </div>
+                <p class="help is-danger" v-if="errors.password">{{ errors.password }}</p>
+              </div>
 
-        <div class="field">
-          <label class="label" for="confirmPassword">Confirm Password</label>
-          <div class="control">
-            <input
-              class="input"
-              :class="{ 'is-danger': errors.confirmPassword }"
-              type="password"
-              id="confirmPassword"
-              v-model="credentials.confirmPassword"
-              :disabled="isLoading"
-              placeholder="Confirm your password"
-            />
-          </div>
-          <p class="help is-danger" v-if="errors.confirmPassword">{{ errors.confirmPassword }}</p>
-        </div>
-        
-        <div class="field">
-          <div class="control">
-            <button class="button is-primary is-fullwidth" type="submit" :class="{ 'is-loading': isLoading }" :disabled="isLoading">
-              Create Account
-            </button>
-          </div>
-        </div>
-      </form>
+              <div class="field">
+                <label class="label" for="confirmPassword">Confirm Password</label>
+                <div class="control">
+                  <input
+                    class="input"
+                    :class="{ 'is-danger': errors.confirmPassword }"
+                    type="password"
+                    id="confirmPassword"
+                    v-model="credentials.confirmPassword"
+                    :disabled="isLoading"
+                    placeholder="Confirm your password"
+                  />
+                </div>
+                <p class="help is-danger" v-if="errors.confirmPassword">{{ errors.confirmPassword }}</p>
+              </div>
+              
+              <div class="field">
+                <div class="control">
+                  <button class="button is-primary is-fullwidth" type="submit" :class="{ 'is-loading': isLoading }" :disabled="isLoading">
+                    Create Account
+                  </button>
+                </div>
+              </div>
+            </form>
 
             <div class="notification is-danger" v-if="errorMessage">
               {{ errorMessage }}
