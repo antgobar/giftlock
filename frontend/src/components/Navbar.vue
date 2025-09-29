@@ -1,12 +1,12 @@
 <template>
   <nav class="navbar is-primary has-shadow" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
-      <router-link to="/" class="navbar-item brand-link">
+      <router-link to="/" class="navbar-item">
         <span class="icon-text">
           <span class="icon">
-            <span class="gift-icon">🎁</span>
+            <i class="fas fa-gift"></i>
           </span>
-          <span class="brand-text">Gift Lock</span>
+          <span class="title is-5 has-text-white">Gift Lock</span>
         </span>
       </router-link>
     </div>
@@ -107,39 +107,3 @@ defineExpose({
 })
 </script>
 
-<style scoped>
-.navbar {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-  border-bottom: 3px solid rgba(255, 255, 255, 0.1);
-}
-
-.brand-link {
-  font-weight: bold;
-  font-size: 1.25rem;
-}
-
-.brand-text {
-  color: white !important;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-
-.gift-icon {
-  font-size: 1.5em;
-  margin-right: 0.25rem;
-}
-
-.navbar-item {
-  color: white !important;
-  transition: background-color 0.3s ease;
-}
-
-.navbar-item:hover {
-  background-color: rgba(255, 255, 255, 0.1) !important;
-  color: white !important;
-}
-
-.navbar-menu {
-  background: transparent;
-}
-</style>

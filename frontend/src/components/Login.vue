@@ -6,59 +6,53 @@
           <div class="box">
             <h2 class="title is-3 has-text-centered">Sign In</h2>
       
-      <form @submit.prevent="handleLogin">
-        <div class="field">
-          <label class="label" for="username">Username</label>
-          <div class="control">
-            <input
-              class="input"
-              type="text"
-              id="username"
-              v-model="credentials.username"
-              required
-              :disabled="isLoading"
-              placeholder="Enter your username"
-            />
-          </div>
-        </div>
-        
-        <div class="field">
-          <label class="label" for="password">Password</label>
-          <div class="control">
-            <input
-              class="input"
-              type="password"
-              id="password"
-              v-model="credentials.password"
-              required
-              :disabled="isLoading"
-              placeholder="Enter your password"
-            />
-          </div>
-        </div>
-        
-        <div class="field">
-          <div class="control">
-            <button class="button is-primary is-fullwidth" type="submit" :disabled="isLoading">
-              <span v-if="isLoading">
-                <i class="fas fa-spinner fa-spin"></i>
-                Signing in...
-              </span>
-              <span v-else>
-                Sign In
-              </span>
-            </button>
-          </div>
-        </div>
-      </form>
-      
-      <div class="notification is-danger" v-if="errorMessage">
-        {{ errorMessage }}
-      </div>
-      
-      <div class="notification is-success" v-if="successMessage">
-        {{ successMessage }}
-      </div>
+            <form @submit.prevent="handleLogin">
+              <div class="field">
+                <label class="label" for="username">Username</label>
+                <div class="control">
+                  <input
+                    class="input"
+                    type="text"
+                    id="username"
+                    v-model="credentials.username"
+                    required
+                    :disabled="isLoading"
+                    placeholder="Enter your username"
+                  />
+                </div>
+              </div>
+              
+              <div class="field">
+                <label class="label" for="password">Password</label>
+                <div class="control">
+                  <input
+                    class="input"
+                    type="password"
+                    id="password"
+                    v-model="credentials.password"
+                    required
+                    :disabled="isLoading"
+                    placeholder="Enter your password"
+                  />
+                </div>
+              </div>
+              
+              <div class="field">
+                <div class="control">
+                  <button class="button is-primary is-fullwidth" type="submit" :class="{ 'is-loading': isLoading }" :disabled="isLoading">
+                    Sign In
+                  </button>
+                </div>
+              </div>
+            </form>
+            
+            <div class="notification is-danger" v-if="errorMessage">
+              {{ errorMessage }}
+            </div>
+            
+            <div class="notification is-success" v-if="successMessage">
+              {{ successMessage }}
+            </div>
 
             <div class="has-text-centered mt-4">
               <p>Don't have an account? 

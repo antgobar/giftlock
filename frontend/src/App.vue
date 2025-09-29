@@ -1,13 +1,20 @@
 <template>
-  <div class="container">
-    <h1 class="title">Gift Lock</h1>
-    <router-view></router-view>
+  <div id="app">
+    <Navbar />
+    <div class="container">
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 
 <script>
+import Navbar from './components/Navbar.vue';
+
 export default {
   name: "App",
+  components: {
+    Navbar
+  }
 };
 </script>
 
