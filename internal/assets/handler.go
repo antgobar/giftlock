@@ -16,24 +16,24 @@ func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.Handle("GET /assets/", http.StripPrefix("/assets/", http.HandlerFunc(frontendAssets)))
 	mux.HandleFunc("/favicon.ico", favicon)
 	mux.HandleFunc("/bulma.min.css", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "web/bulma.min.css")
+		http.ServeFile(w, r, "assets/bulma.min.css")
 	})
 }
 
 func (h *Handler) home(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/" || (!strings.HasPrefix(r.URL.Path, "/api/") && !strings.HasPrefix(r.URL.Path, "/assets/") && r.URL.Path != "/favicon.ico") {
-		http.ServeFile(w, r, "web/index.html")
+		http.ServeFile(w, r, "assets/index.html")
 		return
 	}
 	http.NotFound(w, r)
 }
 
 func favicon(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "web/favicon.ico")
+	http.ServeFile(w, r, "assets/favicon.ico")
 }
 
 func frontendAssets(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "public, max-age=31536000")
-	fs := http.FileServer(http.Dir("web/assets"))
+	fs := http.FileServer(http.Dir("assets/assets"))
 	fs.ServeHTTP(w, r)
 }

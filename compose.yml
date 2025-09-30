@@ -8,11 +8,11 @@ services:
     environment:
       - POSTGRES_PASSWORD=giftlockpassword
       - POSTGRES_DB=giftlock
-      - POSTGRES_USER=postgres
+      - POSTGRES_USER=giftlockuser
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "giftlock"]
+      test: ["CMD", "pg_isready", "-U", "giftlockuser", "-d", "giftlock"]
       interval: 10s
       timeout: 5s
       retries: 5
