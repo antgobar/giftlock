@@ -19,5 +19,4 @@ RUN adduser \
 USER appuser
 
 COPY --from=build /bin/web .
-# RUN chmod +x ./web
 ENTRYPOINT ["sh", "-c", "./web"]
