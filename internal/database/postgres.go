@@ -17,7 +17,6 @@ func NewPostgresPool(ctx context.Context, url string) *PostgresDb {
 	if err != nil {
 		log.Fatalln("Error connecting to PostgresDB", err.Error())
 	}
-	// Execute schema.sql
 	schemaPath := "sql/schema.sql"
 	schemaBytes, err := os.ReadFile(schemaPath)
 	if err != nil {
