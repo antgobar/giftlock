@@ -64,11 +64,11 @@
               </div>
             </form>
 
-            <div class="notification is-danger" v-if="errorMessage">
+            <div class="notification is-danger mt-4" v-if="errorMessage">
               {{ errorMessage }}
             </div>
 
-            <div class="notification is-success" v-if="successMessage">
+            <div class="notification is-success mt-4" v-if="successMessage">
               {{ successMessage }}
             </div>
 
