@@ -24,6 +24,11 @@ type Group struct {
 	CreatedAt   time.Time `json:"createdAt"`
 }
 
+type GroupDetails struct {
+	Group   Group
+	Members []*Gift `json:"membersGifts"`
+}
+
 type ModelId interface {
 	UserId | SessionID | GiftId | GroupId
 }
@@ -46,6 +51,7 @@ type Session struct {
 type GiftId uuid.UUID
 type Gift struct {
 	ID          GiftId     `json:"id"`
+	GroupId     GroupId    `json:"groupId"`
 	Title       string     `json:"title"`
 	Description string     `json:"description"`
 	Link        string     `json:"link"`

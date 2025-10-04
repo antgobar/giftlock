@@ -7,7 +7,7 @@ run:
 
 run-frontend:
 	@echo "Running frontend..."
-	cd frontend && npm run dev
+	cd frontend && nvm use 22; npm install && npm run build && npm run dev
 
 build-frontend:
 	@echo "Building frontend..."

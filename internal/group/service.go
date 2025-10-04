@@ -40,3 +40,7 @@ func (s *Service) GetCreatedGroups(ctx context.Context, userID model.UserId) ([]
 func (s *Service) JoinGroup(ctx context.Context, userID model.UserId, groupID model.GroupId) error {
 	return s.repo.Join(ctx, userID, groupID)
 }
+
+func (s *Service) ViewGroup(ctx context.Context, userId model.UserId, groupId model.GroupId) (*model.GroupDetails, error) {
+	return s.repo.GetGroupDetails(ctx, userId, groupId)
+}

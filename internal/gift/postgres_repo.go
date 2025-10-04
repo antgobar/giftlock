@@ -19,12 +19,13 @@ func NewPostgresRepository(db *pgxpool.Pool) *PostgresRepo {
 func (s *PostgresRepo) Create(ctx context.Context, gift *model.Gift) (*model.Gift, error) {
 	sql := `
 		INSERT INTO gifts (
-			title, description, link, price, created_by
+			group_id, title, description, link, price, created_by
 		) VALUES (
-			$1, $2, $3, $4, $5
-		) RETURNING id, title, description, link, price, created_by, created_at;
+			$1, $2, $3, $4, $5, $6
+		) RETURNING id, group_id, title, description, link, price, created_by, created_at;
 	`
 	row := s.db.QueryRow(ctx, sql,
+		gift.GroupId,
 		gift.Title,
 		gift.Description,
 		gift.Link,
@@ -34,6 +35,7 @@ func (s *PostgresRepo) Create(ctx context.Context, gift *model.Gift) (*model.Gif
 	var created model.Gift
 	err := row.Scan(
 		&created.ID,
+		&created.GroupId,
 		&created.Title,
 		&created.Description,
 		&created.Link,

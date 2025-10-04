@@ -13,7 +13,7 @@ func NewService(r Repository) *Service {
 	return &Service{repo: r}
 }
 
-func (s *Service) CreateOwnGift(ctx context.Context, userId model.UserId, title, description, link string) (*model.Gift, error) {
+func (s *Service) CreateOwnGift(ctx context.Context, userId model.UserId, groupId model.GroupId, title, description, link string) (*model.Gift, error) {
 	gift := model.Gift{
 		Title: title, Description: description, Link: link, CreatedBy: userId,
 	}

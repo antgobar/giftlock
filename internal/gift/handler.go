@@ -22,9 +22,15 @@ func NewHandler(svc *Service) *Handler {
 }
 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("POST /api/gifts", h.addGiftToWishList)
+	mux.HandleFunc("POST /api/group/{id}/gifts", h.addGiftToWishList)
 	mux.HandleFunc("GET /api/user/me/gifts", h.viewOwnGifts)
 	mux.HandleFunc("GET /api/user/{id}/gifts", h.viewUserGifts)
+}
+
+type createGiftRequest struct {
+	Title       string
+	Description string
+	Link        string
 }
 
 func (h *Handler) addGiftToWishList(w http.ResponseWriter, r *http.Request) {
@@ -38,22 +44,21 @@ func (h *Handler) addGiftToWishList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := r.ParseForm(); err != nil {
-		log.Println("ERROR: unable to parse form:", err)
-		http.Error(w, "invalid form data", http.StatusBadRequest)
+	groupId, err := model.IdFromString[model.GroupId](r.PathValue("id"))
+	if err != nil {
+		log.Println("ERROR: invalid user id", err)
+		http.Error(w, "Invalid user id", http.StatusBadRequest)
 		return
 	}
 
-	giftTitle := r.FormValue("title")
-	if giftTitle == "" {
-		log.Println("ERROR: missing gift title")
-		http.Error(w, "gift title required", http.StatusBadRequest)
+	var req createGiftRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "Invalid request", http.StatusBadRequest)
 		return
 	}
-	giftDescription := r.FormValue("description")
-	giftLink := r.FormValue("link")
 
-	gift, err := h.svc.CreateOwnGift(ctx, user.ID, giftTitle, giftDescription, giftLink)
+	gift, err := h.svc.CreateOwnGift(ctx, user.ID, groupId, req.Link, req.Description, req.Link)
 	if err != nil {
 		log.Println("ERROR:", err.Error())
 		http.Error(w, "Error creating gift", http.StatusInternalServerError)

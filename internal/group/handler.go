@@ -25,6 +25,7 @@ func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /api/groups", h.createGroup)
 	mux.HandleFunc("GET /api/groups", h.getCreatedGroups)
 	mux.HandleFunc("DELETE /api/groups/{id}", h.deleteOwnGroup)
+	mux.HandleFunc("GET /api/groups/{id}", h.viewGroup)
 }
 
 type groupCreateRequest struct {
@@ -134,4 +135,37 @@ func (h *Handler) deleteOwnGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusAccepted)
+}
+
+func (h *Handler) viewGroup(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), time.Duration(time.Second*3))
+	defer cancel()
+
+	user, ok := auth.UserFromContext(r.Context())
+	if !ok {
+		log.Println("ERROR:", "no user in context")
+		http.Error(w, "Error getting user", http.StatusUnauthorized)
+		return
+	}
+
+	groupId, err := model.IdFromString[model.GroupId](r.PathValue("id"))
+	if err != nil {
+		log.Println("ERROR: invalid group id", err)
+		http.Error(w, "Invalid group id", http.StatusBadRequest)
+		return
+	}
+
+	groupDetails, err := h.svc.ViewGroup(ctx, user.ID, groupId)
+	if err != nil {
+		log.Println("ERROR:", err.Error())
+		http.Error(w, "Error fetching group", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(groupDetails); err != nil {
+		log.Println("ERROR: unable to encode response:", err)
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		return
+	}
 }

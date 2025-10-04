@@ -85,3 +85,9 @@ func (s *PostgresRepo) Join(ctx context.Context, userID model.UserId, groupID mo
 	_, err := s.db.Exec(ctx, sql, userID, groupID)
 	return err
 }
+
+func (s *PostgresRepo) GetGroupDetails(ctx context.Context, userId model.UserId, groupId model.GroupId) (*model.GroupDetails, error) {
+	
+	
+	return &model.GroupDetails{}, nil
+}
