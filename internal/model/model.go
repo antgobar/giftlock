@@ -15,6 +15,10 @@ type User struct {
 	CreatedAt      time.Time `json:"createdAt"`
 }
 
+func (u UserId) String() string {
+	return uuid.UUID(u).String()
+}
+
 type GroupId uuid.UUID
 type Group struct {
 	ID          GroupId   `json:"id"`

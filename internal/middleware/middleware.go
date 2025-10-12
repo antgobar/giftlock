@@ -54,8 +54,8 @@ func (h *SessionHandler) authMiddleware(next http.Handler) http.Handler {
 		defer cancel()
 
 		token := model.SessionToken(cookieVal)
-
 		user, err := h.sessions.GetUserFromToken(ctx, token)
+		log.Println("user from token", user.ID.String(), user.Username)
 		if err != nil {
 			log.Println(err.Error())
 			http.Error(w, "Unauthenticated", http.StatusUnauthorized)
