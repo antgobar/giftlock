@@ -39,13 +39,13 @@ func loggingMiddleware(next http.Handler) http.Handler {
 
 func (h *SessionHandler) authMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if isPublicPath(r.URL.Path, h.cfg.PublicPrefixes) {
+			next.ServeHTTP(w, r)
+			return
+		}
 
 		cookieVal, err := session.GetCookieValue(r)
 		if err != nil {
-			if isPublicPath(r.URL.Path, h.cfg.PublicPrefixes) {
-				next.ServeHTTP(w, r)
-				return
-			}
 			http.Error(w, "Unauthenticated", http.StatusUnauthorized)
 			return
 		}
@@ -57,10 +57,6 @@ func (h *SessionHandler) authMiddleware(next http.Handler) http.Handler {
 
 		user, err := h.sessions.GetUserFromToken(ctx, token)
 		if err != nil {
-			if isPublicPath(r.URL.Path, h.cfg.PublicPrefixes) {
-				next.ServeHTTP(w, r)
-				return
-			}
 			log.Println(err.Error())
 			http.Error(w, "Unauthenticated", http.StatusUnauthorized)
 			return
