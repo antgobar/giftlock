@@ -8,7 +8,6 @@
         "/api/login",
         "/api/register",
         "/api/logout",
-        "/api/me",
         "/login",
         "/logout",
         "/register"
