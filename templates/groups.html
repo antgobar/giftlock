@@ -6,10 +6,10 @@
                 <div class="box">
                     <h1 class="title is-2 has-text-centered">Welcome to Gift Lock!</h1>
                     <div class="field">
-                        <form>
+                        <form method="POST" action="/groups">
                             <div class="field has-addons">
                                 <div class="control is-expanded">
-                                    <input class="input" type="text" placeholder="Group name" v-model="form.name"
+                                    <input class="input" type="text" name="name" placeholder="Group name"
                                         maxlength="255" required />
                                 </div>
                                 <div class="control">
@@ -20,25 +20,31 @@
                             </div>
                             <div class="field">
                                 <div class="control">
-                                    <input class="input" type="text" placeholder="Description (optional)" />
+                                    <input class="input" type="text" name="description"
+                                        placeholder="Description (optional)" />
                                 </div>
                             </div>
                         </form>
                     </div>
                 </div>
 
-                {{ if len .Groups > 0 }}
+                {{ if not .Groups }}
+                <div class="box has-text-centered">
+                    <p class="title is-5">No groups yet</p>
+                    <p class="subtitle">Create your first gift group above!</p>
+                </div>
+                {{ else }}
                 <h2 class="title is-4">My Groups</h2>
                 <div class="columns is-multiline">
-                    {{ for _, group := range .Groups }}
-                    <div class="column is-half">
+                    {{ range .Groups }}
+                    <div class="column is-half" id="group-{{ .ID }}">
                         <div class="card">
                             <div class="card-content">
                                 <div class="media">
                                     <div class="media-content">
-                                        <p class="title is-5">{{ group.Name }}</p>
-                                        <p class="subtitle is-6" v-if="group.Description">{{ group.Description }}</p>
-                                        <p class="subtitle is-6">Created: {{ group.CreatedAt }}</p>
+                                        <p class="title is-5">{{ .Name }}</p>
+                                        <p class="subtitle is-6">{{ .Description }}</p>
+                                        <p class="subtitle is-6">Created: {{ .CreatedAt }}</p>
                                     </div>
                                 </div>
                                 <div class="content">
@@ -46,20 +52,18 @@
                                         <button class="button is-small is-primary">
                                             View Group
                                         </button>
-                                        <button class="button is-small is-danger">
-                                            Delete
-                                        </button>
+                                        <form hx-delete="/groups/{{ .ID }}" hx-target="#group-{{ .ID }}"
+                                            hx-swap="outerHTML">
+                                            <button class="button is-small is-danger">
+                                                Delete
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     {{ end }}
-                </div>
-                {{ else }}
-                <div class="box has-text-centered">
-                    <p class="title is-5">No groups yet</p>
-                    <p class="subtitle">Create your first gift group above!</p>
                 </div>
                 {{ end }}
             </div>

@@ -24,15 +24,10 @@ func NewHandler(svc *Service, p presentation.Presenter) *Handler {
 }
 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("POST /api/groups", h.createGroup)
+	mux.HandleFunc("POST /groups", h.createGroup)
 	mux.HandleFunc("GET /groups", h.getCreatedGroups)
-	mux.HandleFunc("DELETE /api/groups/{id}", h.deleteOwnGroup)
+	mux.HandleFunc("DELETE /groups/{id}", h.deleteOwnGroup)
 	mux.HandleFunc("GET /api/groups/{id}", h.viewGroup)
-}
-
-type groupCreateRequest struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
 }
 
 func (h *Handler) createGroup(w http.ResponseWriter, r *http.Request) {
@@ -46,44 +41,40 @@ func (h *Handler) createGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req groupCreateRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		log.Println("ERROR: unable to parse JSON:", err)
-		http.Error(w, "invalid JSON data", http.StatusBadRequest)
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Invalid form data", http.StatusBadRequest)
 		return
 	}
 
-	if req.Name == "" {
+	groupName := r.FormValue("name")
+	groupDescription := r.FormValue("name")
+
+	if groupName == "" {
 		log.Println("ERROR: missing group name")
 		http.Error(w, "group name required", http.StatusBadRequest)
 		return
 	}
 
-	if len(req.Name) > 255 {
+	if len(groupName) > 255 {
 		log.Println("ERROR: group name too long")
 		http.Error(w, "group name must be 255 characters or less", http.StatusBadRequest)
 		return
 	}
 
-	if len(req.Description) > 1000 {
+	if len(groupDescription) > 1000 {
 		log.Println("ERROR: group description too long")
 		http.Error(w, "group description must be 1000 characters or less", http.StatusBadRequest)
 		return
 	}
 
-	group, err := h.svc.CreateAndJoinGroup(ctx, user.ID, req.Name, req.Description)
+	_, err := h.svc.CreateAndJoinGroup(ctx, user.ID, groupName, groupDescription)
 	if err != nil {
 		log.Println("ERROR:", err.Error())
 		http.Error(w, "Error creating group", http.StatusInternalServerError)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(group); err != nil {
-		log.Println("ERROR: unable to encode response:", err)
-		http.Error(w, "Error encoding response", http.StatusInternalServerError)
-		return
-	}
+	http.Redirect(w, r, "/groups", http.StatusSeeOther)
 }
 
 func (h *Handler) getCreatedGroups(w http.ResponseWriter, r *http.Request) {
@@ -113,7 +104,7 @@ func (h *Handler) getCreatedGroups(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := h.p.Present(w, r, "groups", data); err != nil {
 		log.Println("ERROR:", err.Error())
-		http.Error(w, "resource error", http.StatusInternalServerError)
+		http.Error(w, "Error loading groups page", http.StatusInternalServerError)
 	}
 }
 
