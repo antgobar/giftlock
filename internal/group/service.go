@@ -3,6 +3,7 @@ package group
 import (
 	"context"
 	"giftlock/internal/model"
+	"log"
 )
 
 type Service struct {
@@ -41,6 +42,11 @@ func (s *Service) JoinGroup(ctx context.Context, userID model.UserId, groupID mo
 	return s.repo.Join(ctx, userID, groupID)
 }
 
-func (s *Service) ViewGroup(ctx context.Context, userId model.UserId, groupId model.GroupId) (*model.GroupDetails, error) {
-	return s.repo.GetGroupDetails(ctx, userId, groupId)
+func (s *Service) ViewGroup(ctx context.Context, userId model.UserId, groupId model.GroupId) (any, error) {
+	members, _ := s.repo.GroupMembers(ctx, groupId)
+
+	details, _ := s.repo.GroupDetails(ctx, groupId)
+
+	log.Println(members, details)
+	return nil, nil
 }

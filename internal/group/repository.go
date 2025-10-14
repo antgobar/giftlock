@@ -10,5 +10,6 @@ type Repository interface {
 	Delete(ctx context.Context, userId model.UserId, groupID model.GroupId) error
 	ListCreated(ctx context.Context, userID model.UserId) ([]*model.Group, error)
 	Join(ctx context.Context, userID model.UserId, groupID model.GroupId) error
-	GetGroupDetails(ctx context.Context, userId model.UserId, groupId model.GroupId) (*model.GroupDetails, error)
+	GroupMembers(ctx context.Context, groupId model.GroupId) ([]*model.GroupMember, error)
+	GroupDetails(ctx context.Context, groupId model.GroupId) (*model.Group, error)
 }

@@ -86,8 +86,31 @@ func (s *PostgresRepo) Join(ctx context.Context, userID model.UserId, groupID mo
 	return err
 }
 
-func (s *PostgresRepo) GetGroupDetails(ctx context.Context, userId model.UserId, groupId model.GroupId) (*model.GroupDetails, error) {
-	
-	
-	return &model.GroupDetails{}, nil
+func (s *PostgresRepo) GroupDetails(ctx context.Context, groupId model.GroupId) (*model.Group, error) {
+	return &model.Group{}, nil
+}
+
+func (s *PostgresRepo) GroupMembers(ctx context.Context, groupId model.GroupId) ([]*model.GroupMember, error) {
+	sql := `SELECT group_members.user_id, group_members.joined_at
+			FROM group_members
+			WHERE group_members.group_id = $1
+	`
+	rows, err := s.db.Query(ctx, sql, groupId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var groups []*model.GroupMember
+	for rows.Next() {
+		var group model.GroupMember
+		if err := rows.Scan(
+			&group.UserId,
+			&group.JoinedAt,
+		); err != nil {
+			return nil, err
+		}
+		groups = append(groups, &group)
+	}
+	return groups, nil
 }

@@ -14,7 +14,7 @@
             class="button is-small is-primary"
             @click="$emit('view-gifts', group)"
           >
-            View Gifts
+            View Group
           </button>
           <button 
             class="button is-small is-info"
