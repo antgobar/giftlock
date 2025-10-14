@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"log"
 	"net/http"
@@ -21,26 +20,22 @@ func NewHandler(svc *Service) *Handler {
 }
 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("POST /api/register", h.register)
-}
-
-type RegisterRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	mux.HandleFunc("POST /register", h.register)
 }
 
 func (h *Handler) register(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), time.Duration(time.Second*3))
 	defer cancel()
 
-	var req RegisterRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		log.Println("ERROR: unable to parse JSON:", err)
-		http.Error(w, "invalid JSON data", http.StatusBadRequest)
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Invalid form data", http.StatusBadRequest)
 		return
 	}
 
-	err := h.svc.Register(ctx, req.Username, req.Password)
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+
+	err := h.svc.Register(ctx, username, password)
 
 	if errors.Is(err, ErrUsernameTaken) {
 		http.Error(w, "username taken", http.StatusConflict)
@@ -48,11 +43,10 @@ func (h *Handler) register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		log.Printf("ERROR: registering user '%s': %v", req.Username, err)
+		log.Printf("ERROR: registering user '%s': %v", username, err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }

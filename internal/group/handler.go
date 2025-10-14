@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"giftlock/internal/auth"
 	"giftlock/internal/model"
+	"giftlock/internal/presentation"
 	"log"
 	"net/http"
 	"time"
@@ -12,18 +13,19 @@ import (
 
 type Handler struct {
 	svc *Service
+	p   presentation.Presenter
 }
 
-func NewHandler(svc *Service) *Handler {
+func NewHandler(svc *Service, p presentation.Presenter) *Handler {
 	if svc == nil {
 		log.Fatalln("User handler is nil")
 	}
-	return &Handler{svc: svc}
+	return &Handler{svc: svc, p: p}
 }
 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /api/groups", h.createGroup)
-	mux.HandleFunc("GET /api/groups", h.getCreatedGroups)
+	mux.HandleFunc("GET /groups", h.getCreatedGroups)
 	mux.HandleFunc("DELETE /api/groups/{id}", h.deleteOwnGroup)
 	mux.HandleFunc("GET /api/groups/{id}", h.viewGroup)
 }
@@ -91,7 +93,7 @@ func (h *Handler) getCreatedGroups(w http.ResponseWriter, r *http.Request) {
 	user, ok := auth.UserFromContext(r.Context())
 	if !ok {
 		log.Println("ERROR:", "no user in context")
-		http.Error(w, "Error getting user", http.StatusUnauthorized)
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
 
@@ -102,11 +104,16 @@ func (h *Handler) getCreatedGroups(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(groups); err != nil {
-		log.Println("ERROR: unable to encode response:", err)
-		http.Error(w, "Error encoding response", http.StatusInternalServerError)
-		return
+	data := struct {
+		User   *model.User
+		Groups []*model.Group
+	}{
+		User:   user,
+		Groups: groups,
+	}
+	if err := h.p.Present(w, r, "groups", data); err != nil {
+		log.Println("ERROR:", err.Error())
+		http.Error(w, "resource error", http.StatusInternalServerError)
 	}
 }
 

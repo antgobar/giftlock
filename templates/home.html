@@ -4,20 +4,19 @@
         <div class="has-text-centered">
             <h1 class="title">Welcome to Gift Lock</h1>
             <p class="subtitle">Secure gift exchanges made simple</p>
-
             {{ if .User }}
+            <div class="buttons is-centered mt-5">
+                <a href="/groups" class="button is-primary">
+                    Go to Groups
+                </a>
+            </div>
+            {{ else }}
             <div class="buttons is-centered mt-5">
                 <a href="/register" class="button is-primary">
                     Sign Up
                 </a>
                 <a href="/login" class="button">
                     Log In
-                </a>
-            </div>
-            {{ else }}
-            <div class="buttons is-centered mt-5">
-                <a href="/groups" class="button is-primary">
-                    Go to Groups
                 </a>
             </div>
             {{ end }}

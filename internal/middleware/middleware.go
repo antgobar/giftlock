@@ -46,7 +46,7 @@ func (h *SessionHandler) authMiddleware(next http.Handler) http.Handler {
 
 		cookieVal, err := session.GetCookieValue(r)
 		if err != nil {
-			http.Error(w, "Unauthenticated", http.StatusUnauthorized)
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}
 
@@ -58,7 +58,7 @@ func (h *SessionHandler) authMiddleware(next http.Handler) http.Handler {
 		log.Println("User from token", user.Username)
 		if err != nil {
 			log.Println(err.Error())
-			http.Error(w, "Unauthenticated", http.StatusUnauthorized)
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
 			return
 		}
 

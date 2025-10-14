@@ -2,8 +2,7 @@ package auth
 
 import (
 	"context"
-	"encoding/json"
-	"giftlock/internal/model"
+	"giftlock/internal/presentation"
 	"giftlock/internal/session"
 	"log"
 	"net/http"
@@ -12,36 +11,32 @@ import (
 
 type Handler struct {
 	svc *Service
+	p   presentation.Presenter
 }
 
-func NewHandler(svc *Service) *Handler {
-	return &Handler{svc: svc}
+func NewHandler(svc *Service, p presentation.Presenter) *Handler {
+	return &Handler{svc: svc, p: p}
 }
 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("POST /api/login", h.logIn)
-	mux.HandleFunc("POST /api/logout", h.logOut)
-	mux.HandleFunc("GET /api/logout", h.logOut)
-	mux.HandleFunc("GET /api/me", h.me)
-}
-
-type loginRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	mux.HandleFunc("POST /login", h.logIn)
+	mux.HandleFunc("GET /logout", h.logOut)
+	mux.HandleFunc("POST /logout", h.logOut)
 }
 
 func (h *Handler) logIn(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*3))
 	defer cancel()
 
-	var req loginRequest
-
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request", http.StatusBadRequest)
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Invalid form data", http.StatusBadRequest)
 		return
 	}
 
-	sesh, err := h.svc.LogIn(ctx, req.Username, req.Password)
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+
+	sesh, err := h.svc.LogIn(ctx, username, password)
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, "invalid login", http.StatusUnauthorized)
@@ -49,17 +44,18 @@ func (h *Handler) logIn(w http.ResponseWriter, r *http.Request) {
 	}
 
 	session.SetCookie(w, string(sesh.Token))
-	w.WriteHeader(http.StatusOK)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func (h *Handler) logOut(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*3))
+	ctx, cancel := context.WithTimeout(r.Context(), time.Duration(time.Second*3))
 	defer cancel()
+
+	session.ClearCookie(w)
 
 	user, ok := UserFromContext(r.Context())
 	if !ok {
-		session.ClearCookie(w)
-		w.WriteHeader(http.StatusOK)
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
 
@@ -68,31 +64,6 @@ func (h *Handler) logOut(w http.ResponseWriter, r *http.Request) {
 		log.Println("Error logging out:", err.Error())
 	}
 
-	session.ClearCookie(w)
-	w.WriteHeader(http.StatusOK)
-}
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
 
-type meResponse struct {
-	Username string       `json:"username"`
-	ID       model.UserId `json:"id"`
-}
-
-func (h *Handler) me(w http.ResponseWriter, r *http.Request) {
-	user, ok := UserFromContext(r.Context())
-	if !ok {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-
-	response := meResponse{
-		Username: user.Username,
-		ID:       user.ID,
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(response); err != nil {
-		log.Printf("Error encoding user info: %v", err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
-		return
-	}
 }

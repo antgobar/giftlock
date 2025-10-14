@@ -19,17 +19,16 @@ func NewPostgresRepository(db *pgxpool.Pool) *PostgresRepo {
 func (s *PostgresRepo) Create(ctx context.Context, gift *model.Gift) (*model.Gift, error) {
 	sql := `
 		INSERT INTO gifts (
-			group_id, title, description, link, price, created_by
+			group_id, title, description, link, created_by
 		) VALUES (
-			$1, $2, $3, $4, $5, $6
-		) RETURNING id, group_id, title, description, link, price, created_by, created_at;
+			$1, $2, $3, $4, $5
+		) RETURNING id, group_id, title, description, link, created_by, created_at;
 	`
 	row := s.db.QueryRow(ctx, sql,
 		gift.GroupId,
 		gift.Title,
 		gift.Description,
 		gift.Link,
-		gift.Price,
 		gift.CreatedBy,
 	)
 	var created model.Gift
@@ -39,7 +38,6 @@ func (s *PostgresRepo) Create(ctx context.Context, gift *model.Gift) (*model.Gif
 		&created.Title,
 		&created.Description,
 		&created.Link,
-		&created.Price,
 		&created.CreatedBy,
 		&created.CreatedAt,
 	)
@@ -51,7 +49,7 @@ func (s *PostgresRepo) Create(ctx context.Context, gift *model.Gift) (*model.Gif
 
 func (s *PostgresRepo) GetAllUser(ctx context.Context, userId model.UserId) ([]*model.Gift, error) {
 	sql := `
-		SELECT id, title, description, price, link, claimed_at, created_by
+		SELECT id, title, description, link, claimed_at, created_by
 		FROM gifts
 		WHERE gifts.created_by = $1
 	`
@@ -77,15 +75,14 @@ func (s *PostgresRepo) GetAllUser(ctx context.Context, userId model.UserId) ([]*
 func (s *PostgresRepo) Edit(ctx context.Context, gift *model.Gift) (*model.Gift, error) {
 	sql := `
 		UPDATE gifts 
-		SET title = $1, description = $2, link = $3, price = $4
-		WHERE id = $5 AND created_by = $6
-		RETURNING id, title, description, link, price, created_by, created_at, claimed_by, claimed_at;
+		SET title = $1, description = $2, link = $3
+		WHERE id = $4 AND created_by = $5
+		RETURNING id, title, description, link, created_by, created_at, claimed_by, claimed_at;
 	`
 	row := s.db.QueryRow(ctx, sql,
 		gift.Title,
 		gift.Description,
 		gift.Link,
-		gift.Price,
 		gift.ID,
 		gift.CreatedBy,
 	)
@@ -95,7 +92,6 @@ func (s *PostgresRepo) Edit(ctx context.Context, gift *model.Gift) (*model.Gift,
 		&updated.Title,
 		&updated.Description,
 		&updated.Link,
-		&updated.Price,
 		&updated.CreatedBy,
 		&updated.CreatedAt,
 		&updated.ClaimedBy,
@@ -130,7 +126,7 @@ func (s *PostgresRepo) Claim(ctx context.Context, giftId model.GiftId, userId mo
 		UPDATE gifts 
 		SET claimed_by = $1, claimed_at = NOW()
 		WHERE id = $2 AND claimed_by IS NULL
-		RETURNING id, title, description, link, price, created_by, created_at, claimed_by, claimed_at;
+		RETURNING id, title, description, link, created_by, created_at, claimed_by, claimed_at;
 	`
 	row := s.db.QueryRow(ctx, sql, userId, giftId)
 
@@ -140,7 +136,6 @@ func (s *PostgresRepo) Claim(ctx context.Context, giftId model.GiftId, userId mo
 		&claimed.Title,
 		&claimed.Description,
 		&claimed.Link,
-		&claimed.Price,
 		&claimed.CreatedBy,
 		&claimed.CreatedAt,
 		&claimed.ClaimedBy,

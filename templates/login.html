@@ -6,11 +6,11 @@
                 <div class="box">
                     <h2 class="title is-3 has-text-centered">Sign In</h2>
 
-                    <form>
+                    <form method="POST" action="/login">
                         <div class="field">
                             <label class="label" for="username">Username</label>
                             <div class="control">
-                                <input class="input" type="text" id="username" required
+                                <input class="input" type="text" id="username" name="username" required
                                     placeholder="Enter your username" />
                             </div>
                         </div>
@@ -18,7 +18,7 @@
                         <div class="field">
                             <label class="label" for="password">Password</label>
                             <div class="control">
-                                <input class="input" type="password" id="password" required
+                                <input class="input" type="password" id="password" name="password" required
                                     placeholder="Enter your password" />
                             </div>
                         </div>

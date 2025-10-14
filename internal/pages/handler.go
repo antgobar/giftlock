@@ -28,10 +28,7 @@ func (h *Handler) home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, ok := auth.UserFromContext(r.Context())
-	if !ok {
-		user = nil
-	}
+	user, _ := auth.UserFromContext(r.Context())
 
 	data := struct {
 		User *model.User

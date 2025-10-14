@@ -41,9 +41,9 @@ func main() {
 	htmlService := presentation.NewHtmlPresentationService()
 
 	userHandler := user.NewHandler(userService)
-	authHandler := auth.NewHandler(authService)
+	authHandler := auth.NewHandler(authService, htmlService)
 	giftHandler := gift.NewHandler(giftService)
-	groupHandler := group.NewHandler(groupService)
+	groupHandler := group.NewHandler(groupService, htmlService)
 	assetsHandler := assets.NewHandler()
 	pagesHandler := pages.NewHandler(htmlService)
 
