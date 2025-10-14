@@ -2,7 +2,6 @@ package group
 
 import (
 	"context"
-	"encoding/json"
 	"giftlock/internal/auth"
 	"giftlock/internal/model"
 	"giftlock/internal/presentation"
@@ -25,9 +24,9 @@ func NewHandler(svc *Service, p presentation.Presenter) *Handler {
 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /groups", h.createGroup)
-	mux.HandleFunc("GET /groups", h.getCreatedGroups)
 	mux.HandleFunc("DELETE /groups/{id}", h.deleteOwnGroup)
-	mux.HandleFunc("GET /api/groups/{id}", h.viewGroup)
+	mux.HandleFunc("GET /groups/{id}", h.viewGroup)
+	mux.HandleFunc("GET /groups", h.getCreatedGroups)
 }
 
 func (h *Handler) createGroup(w http.ResponseWriter, r *http.Request) {
@@ -47,7 +46,7 @@ func (h *Handler) createGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	groupName := r.FormValue("name")
-	groupDescription := r.FormValue("name")
+	groupDescription := r.FormValue("description")
 
 	if groupName == "" {
 		log.Println("ERROR: missing group name")
@@ -160,10 +159,18 @@ func (h *Handler) viewGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(groupDetails); err != nil {
-		log.Println("ERROR: unable to encode response:", err)
-		http.Error(w, "Error encoding response", http.StatusInternalServerError)
-		return
+	log.Println("Group", groupDetails)
+
+	data := struct {
+		User  *model.User
+		Group *model.Group
+	}{
+		User:  user,
+		Group: &model.Group{Name: "Some Group", Description: "Some desc", CreatedAt: time.Now()},
+	}
+
+	if err := h.p.Present(w, r, "group", data); err != nil {
+		log.Println("ERROR:", err.Error())
+		http.Error(w, "Error loading groups page", http.StatusInternalServerError)
 	}
 }

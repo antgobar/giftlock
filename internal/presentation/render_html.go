@@ -15,6 +15,7 @@ var pageTemplates []string = []string{
 	"login",
 	"register",
 	"groups",
+	"group",
 }
 
 var baseTemplates []string = []string{

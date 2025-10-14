@@ -49,9 +49,11 @@
                                 </div>
                                 <div class="content">
                                     <div class="buttons">
-                                        <button class="button is-small is-primary">
-                                            View Group
-                                        </button>
+                                        <a href="/groups/{{ .ID }}">
+                                            <button class="button is-small is-primary">
+                                                View Group
+                                            </button>
+                                        </a>
                                         <form hx-delete="/groups/{{ .ID }}" hx-target="#group-{{ .ID }}"
                                             hx-swap="outerHTML">
                                             <button class="button is-small is-danger">
