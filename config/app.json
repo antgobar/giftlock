@@ -2,12 +2,7 @@
     "serverAddressEnv": "SERVER_ADDR",
     "databaseUrlEnv": "DATABASE_URL",
     "publicPrefixes": [
-        "/favicon.ico",
-        "/bulma.min.css",
-        "/assets",
-        "/api/login",
-        "/api/register",
-        "/api/logout",
+        "/static",
         "/login",
         "/logout",
         "/register"

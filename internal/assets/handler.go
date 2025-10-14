@@ -2,7 +2,6 @@ package assets
 
 import (
 	"net/http"
-	"strings"
 )
 
 type Handler struct{}
@@ -12,28 +11,15 @@ func NewHandler() *Handler {
 }
 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("/", h.home)
-	mux.Handle("GET /assets/", http.StripPrefix("/assets/", http.HandlerFunc(frontendAssets)))
-	mux.HandleFunc("/favicon.ico", favicon)
-	mux.HandleFunc("/bulma.min.css", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "assets/bulma.min.css")
-	})
+	mux.Handle("GET /static/", http.StripPrefix("/static/", http.HandlerFunc(staticResources)))
+	mux.HandleFunc("GET /favicon.ico", favicon)
 }
-
-func (h *Handler) home(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path == "/" || (!strings.HasPrefix(r.URL.Path, "/api/") && !strings.HasPrefix(r.URL.Path, "/assets/") && r.URL.Path != "/favicon.ico") {
-		http.ServeFile(w, r, "assets/index.html")
-		return
-	}
-	http.NotFound(w, r)
+func staticResources(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "public, max-age=31536000")
+	fs := http.FileServer(http.Dir("static"))
+	fs.ServeHTTP(w, r)
 }
 
 func favicon(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "assets/favicon.ico")
-}
-
-func frontendAssets(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Cache-Control", "public, max-age=31536000")
-	fs := http.FileServer(http.Dir("assets/assets"))
-	fs.ServeHTTP(w, r)
+	http.Redirect(w, r, "/static/favicon.ico", http.StatusMovedPermanently)
 }

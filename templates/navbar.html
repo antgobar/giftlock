@@ -1,0 +1,56 @@
+{{ define "navbar" }}
+<nav class="navbar is-primary has-shadow" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a href="/" class="navbar-icon">
+            <h1 class="title has-text-white">Gift Lock</h1>
+        </a>
+
+        <a role="button" class="navbar-burger" aria-label="menu">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
+
+    <div class="navbar-menu">
+        <div class="navbar-end">
+            {{ if .User }}
+            <a href="/dashboard" class="navbar-item">
+                <span class="icon-text">
+                    <span class="icon">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </span>
+                    <span>Dashboard</span>
+                </span>
+            </a>
+            <a href="/logout" class="navbar-item">
+                <span class="icon-text">
+                    <span class="icon">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </span>
+                    <span>Logout</span>
+                </span>
+            </a>
+            {{ else }}
+            <a href="/login" class="navbar-item" @click="closeBurger">
+                <span class="icon-text">
+                    <span class="icon">
+                        <i class="fas fa-sign-in-alt"></i>
+                    </span>
+                    <span>Login</span>
+                </span>
+            </a>
+            <a href="/register" class="navbar-item" @click="closeBurger">
+                <span class="icon-text">
+                    <span class="icon">
+                        <i class="fas fa-user-plus"></i>
+                    </span>
+                    <span>Register</span>
+                </span>
+            </a>
+            {{ end }}
+        </div>
+    </div>
+</nav>
+{{ end }}
