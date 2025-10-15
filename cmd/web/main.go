@@ -21,7 +21,7 @@ import (
 
 func main() {
 	log.SetOutput(os.Stdout)
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	log.SetFlags(log.LstdFlags | log.Llongfile)
 	cfg := config.Load()
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*5))

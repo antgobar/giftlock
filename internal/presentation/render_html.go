@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"slices"
 )
 
 const baseTemplateDir = "templates"
@@ -14,8 +15,12 @@ var pageTemplates []string = []string{
 	"home",
 	"login",
 	"register",
-	"groups",
 	"group",
+	"dashboard",
+}
+
+var partialTemplates []string = []string{
+	"groups",
 }
 
 var baseTemplates []string = []string{
@@ -30,7 +35,7 @@ type Templates struct {
 }
 
 func NewHtmlPresentationService() *Templates {
-	templates, err := compileTemplates(baseTemplates, pageTemplates)
+	templates, err := compileTemplates(baseTemplates, pageTemplates, partialTemplates)
 	if err != nil {
 		log.Fatalln("Failed to compile templates:", err.Error())
 	}
@@ -43,6 +48,11 @@ func (t *Templates) Present(w http.ResponseWriter, r *http.Request, name string,
 		return errors.New(name + " template not found")
 	}
 
+	if slices.Contains(partialTemplates, name) {
+		log.Println("This is a partial")
+		return tmpl.ExecuteTemplate(w, name, payload)
+	}
+
 	tmplName := "base"
 
 	if r.Header.Get("HX-Request") == "true" {
@@ -52,7 +62,7 @@ func (t *Templates) Present(w http.ResponseWriter, r *http.Request, name string,
 	return tmpl.ExecuteTemplate(w, tmplName, payload)
 }
 
-func compileTemplates(bases []string, pages []string) (*CompliedTemplates, error) {
+func compileTemplates(bases []string, pages []string, partials []string) (*CompliedTemplates, error) {
 	var templates = make(CompliedTemplates)
 	for _, p := range pages {
 		var allPages = make([]string, 0)
@@ -64,6 +74,15 @@ func compileTemplates(bases []string, pages []string) (*CompliedTemplates, error
 		templates[p], err = template.ParseFiles(
 			allPages...,
 		)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	var err error
+	for _, partial := range partials {
+		partialFile := fmt.Sprintf("%s/%s.html", baseTemplateDir, partial)
+		templates[partial], err = template.ParseFiles(partialFile)
 		if err != nil {
 			return nil, err
 		}

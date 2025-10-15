@@ -20,6 +20,7 @@ func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /", h.home)
 	mux.HandleFunc("GET /register", h.register)
 	mux.HandleFunc("GET /login", h.login)
+	mux.HandleFunc("GET /dashboard", h.dashboard)
 }
 
 func (h *Handler) home(w http.ResponseWriter, r *http.Request) {
@@ -51,6 +52,13 @@ func (h *Handler) login(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) register(w http.ResponseWriter, r *http.Request) {
 	if err := h.presenter.Present(w, r, "register", nil); err != nil {
+		log.Println("ERROR:", err.Error())
+		http.Error(w, "Error loading registration page", http.StatusInternalServerError)
+	}
+}
+
+func (h *Handler) dashboard(w http.ResponseWriter, r *http.Request) {
+	if err := h.presenter.Present(w, r, "dashboard", nil); err != nil {
 		log.Println("ERROR:", err.Error())
 		http.Error(w, "Error loading registration page", http.StatusInternalServerError)
 	}

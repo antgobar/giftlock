@@ -1,0 +1,35 @@
+{{define "content"}}
+<section class="section">
+    <div class="container">
+        <div class="columns is-centered">
+            <div class="column is-8">
+                <div class="box">
+                    <h1 class="title is-2 has-text-centered">Welcome to Gift Lock!</h1>
+                    <div class="field">
+                        <form method="POST" action="/groups">
+                            <div class="field has-addons">
+                                <div class="control is-expanded">
+                                    <input class="input" type="text" name="name" placeholder="Group name"
+                                        maxlength="255" required />
+                                </div>
+                                <div class="control">
+                                    <button class="button is-primary" type="submit">
+                                        Create Group
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control">
+                                    <input class="input" type="text" name="description"
+                                        placeholder="Description (optional)" />
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div hx-get="/groups" hx-trigger="load"></div>
+            </div>
+        </div>
+    </div>
+</section>
+{{end}}

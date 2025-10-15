@@ -1,75 +1,41 @@
-{{define "content"}}
-<section class="section">
-    <div class="container">
-        <div class="columns is-centered">
-            <div class="column is-8">
-                <div class="box">
-                    <h1 class="title is-2 has-text-centered">Welcome to Gift Lock!</h1>
-                    <div class="field">
-                        <form method="POST" action="/groups">
-                            <div class="field has-addons">
-                                <div class="control is-expanded">
-                                    <input class="input" type="text" name="name" placeholder="Group name"
-                                        maxlength="255" required />
-                                </div>
-                                <div class="control">
-                                    <button class="button is-primary" type="submit">
-                                        Create Group
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="field">
-                                <div class="control">
-                                    <input class="input" type="text" name="description"
-                                        placeholder="Description (optional)" />
-                                </div>
-                            </div>
+{{define "groups"}}
+{{ if not .Groups }}
+<div class="box has-text-centered">
+    <p class="title is-5">No groups yet</p>
+    <p class="subtitle">Create your first gift group above!</p>
+</div>
+{{ else }}
+<h2 class="title is-4">My Groups</h2>
+<div class="columns is-multiline">
+    {{ range .Groups }}
+    <div class="column is-half" id="group-{{ .ID }}">
+        <div class="card">
+            <div class="card-content">
+                <div class="media">
+                    <div class="media-content">
+                        <p class="title is-5">{{ .Name }}</p>
+                        <p class="subtitle is-6">{{ .Description }}</p>
+                        <p class="subtitle is-6">Created: {{ .CreatedAt }}</p>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="buttons">
+                        <a href="/groups/{{ .ID }}">
+                            <button class="button is-small is-primary">
+                                View Group
+                            </button>
+                        </a>
+                        <form hx-delete="/groups/{{ .ID }}" hx-target="#group-{{ .ID }}" hx-swap="outerHTML">
+                            <button class="button is-small is-danger">
+                                Delete
+                            </button>
                         </form>
                     </div>
                 </div>
-
-                {{ if not .Groups }}
-                <div class="box has-text-centered">
-                    <p class="title is-5">No groups yet</p>
-                    <p class="subtitle">Create your first gift group above!</p>
-                </div>
-                {{ else }}
-                <h2 class="title is-4">My Groups</h2>
-                <div class="columns is-multiline">
-                    {{ range .Groups }}
-                    <div class="column is-half" id="group-{{ .ID }}">
-                        <div class="card">
-                            <div class="card-content">
-                                <div class="media">
-                                    <div class="media-content">
-                                        <p class="title is-5">{{ .Name }}</p>
-                                        <p class="subtitle is-6">{{ .Description }}</p>
-                                        <p class="subtitle is-6">Created: {{ .CreatedAt }}</p>
-                                    </div>
-                                </div>
-                                <div class="content">
-                                    <div class="buttons">
-                                        <a href="/groups/{{ .ID }}">
-                                            <button class="button is-small is-primary">
-                                                View Group
-                                            </button>
-                                        </a>
-                                        <form hx-delete="/groups/{{ .ID }}" hx-target="#group-{{ .ID }}"
-                                            hx-swap="outerHTML">
-                                            <button class="button is-small is-danger">
-                                                Delete
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    {{ end }}
-                </div>
-                {{ end }}
             </div>
         </div>
     </div>
-</section>
+    {{ end }}
+</div>
+{{ end }}
 {{end}}

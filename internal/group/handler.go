@@ -73,7 +73,7 @@ func (h *Handler) createGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/groups", http.StatusSeeOther)
+	http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
 }
 
 func (h *Handler) getCreatedGroups(w http.ResponseWriter, r *http.Request) {
@@ -95,10 +95,8 @@ func (h *Handler) getCreatedGroups(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		User   *model.User
 		Groups []*model.Group
 	}{
-		User:   user,
 		Groups: groups,
 	}
 	if err := h.p.Present(w, r, "groups", data); err != nil {
