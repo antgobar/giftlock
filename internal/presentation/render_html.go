@@ -35,7 +35,7 @@ type Templates struct {
 }
 
 func NewHtmlPresentationService() *Templates {
-	templates, err := compileTemplates(baseTemplates, pageTemplates, partialTemplates)
+	templates, err := compileTemplates(baseTemplateDir, baseTemplates, pageTemplates, partialTemplates)
 	if err != nil {
 		log.Fatalln("Failed to compile templates:", err.Error())
 	}
@@ -62,15 +62,39 @@ func (t *Templates) Present(w http.ResponseWriter, r *http.Request, name string,
 	return tmpl.ExecuteTemplate(w, tmplName, payload)
 }
 
-func compileTemplates(bases []string, pages []string, partials []string) (*CompliedTemplates, error) {
+func compileTemplates(dir string, bases []string, pages []string, partials []string) (*CompliedTemplates, error) {
+	pageTemplates, err := compilePages(dir, bases, pages)
+	if err != nil {
+		return nil, err
+	}
+
+	partialTemates, err := compilePartials(dir, partials)
+	if err != nil {
+		return nil, err
+	}
+
+	var templates = make(CompliedTemplates)
+
+	for k, v := range *pageTemplates {
+		templates[k] = v
+	}
+
+	for k, v := range *partialTemates {
+		templates[k] = v
+	}
+
+	return &templates, nil
+}
+
+func compilePages(dir string, bases []string, pages []string) (*CompliedTemplates, error) {
 	var templates = make(CompliedTemplates)
 	for _, p := range pages {
 		var allPages = make([]string, 0)
 		for _, b := range bases {
-			allPages = append(allPages, fmt.Sprintf("%s/%s.html", baseTemplateDir, b))
+			allPages = append(allPages, fmt.Sprintf("%s/%s.html", dir, b))
 		}
 		var err error
-		allPages = append(allPages, fmt.Sprintf("%s/%s.html", baseTemplateDir, p))
+		allPages = append(allPages, fmt.Sprintf("%s/%s.html", dir, p))
 		templates[p], err = template.ParseFiles(
 			allPages...,
 		)
@@ -78,7 +102,11 @@ func compileTemplates(bases []string, pages []string, partials []string) (*Compl
 			return nil, err
 		}
 	}
+	return &templates, nil
+}
 
+func compilePartials(baseTemplateDir string, partials []string) (*CompliedTemplates, error) {
+	var templates = make(CompliedTemplates)
 	var err error
 	for _, partial := range partials {
 		partialFile := fmt.Sprintf("%s/%s.html", baseTemplateDir, partial)
