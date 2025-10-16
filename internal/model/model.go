@@ -34,8 +34,14 @@ func (u GroupId) String() string {
 
 type GroupMember struct {
 	UserId   UserId
+	Username string
 	GroupId  GroupId
 	JoinedAt time.Time
+}
+
+type GroupDetails struct {
+	Group   *Group
+	Members []*GroupMember
 }
 
 type ModelId interface {

@@ -3,7 +3,6 @@ package group
 import (
 	"context"
 	"giftlock/internal/model"
-	"log"
 )
 
 type Service struct {
@@ -24,7 +23,7 @@ func (s *Service) CreateAndJoinGroup(ctx context.Context, userID model.UserId, n
 	if err != nil {
 		return nil, err
 	}
-	if err := s.repo.Join(ctx, userID, createdGroup.ID); err != nil {
+	if err := s.repo.Join(ctx, userID, name, createdGroup.ID); err != nil {
 		return nil, err
 	}
 	return createdGroup, nil
@@ -38,15 +37,23 @@ func (s *Service) GetCreatedGroups(ctx context.Context, userID model.UserId) ([]
 	return s.repo.ListCreated(ctx, userID)
 }
 
-func (s *Service) JoinGroup(ctx context.Context, userID model.UserId, groupID model.GroupId) error {
-	return s.repo.Join(ctx, userID, groupID)
+func (s *Service) JoinGroup(ctx context.Context, userID model.UserId, username string, groupID model.GroupId) error {
+	return s.repo.Join(ctx, userID, username, groupID)
 }
 
-func (s *Service) ViewGroup(ctx context.Context, userId model.UserId, groupId model.GroupId) (any, error) {
-	members, _ := s.repo.GroupMembers(ctx, groupId)
+func (s *Service) ViewGroup(ctx context.Context, userId model.UserId, groupId model.GroupId) (*model.GroupDetails, error) {
+	members, err := s.repo.GroupMembers(ctx, groupId)
+	if err != nil {
+		return nil, err
+	}
 
-	details, _ := s.repo.GroupDetails(ctx, groupId)
+	details, err := s.repo.GroupDetails(ctx, groupId)
+	if err != nil {
+		return nil, err
+	}
 
-	log.Println(members, details)
-	return nil, nil
+	return &model.GroupDetails{
+		Group:   details,
+		Members: members,
+	}, nil
 }

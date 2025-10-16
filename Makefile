@@ -16,3 +16,13 @@ build-frontend:
 format:
 	@echo "Formatting code..."
 	go fmt ./...
+
+boot:
+	@echo "Booting up services..."
+	colima start
+	docker compose up
+
+down:
+	@echo "Tearing down services..."
+	docker compose down
+	colima stop

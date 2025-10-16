@@ -1,13 +1,47 @@
 {{ define "content" }}
 <section class="section">
     <div class="container">
+        <!-- Header Section -->
         <div class="columns is-centered">
-            <div class="column is-8">
-                <div class="box">
-                    <h1 class="title is-2 has-text-centered">{{ .Group.Name }}</h1>
-                    <p class="subtitle is-6">Created: {{ .Group.CreatedAt }}</p>
-                    <p class="mt-4">{{ .Group.Description }}</p>
-                    <a href="/dashboard">&#8592; Back to dashboard</a>
+            <div class="column is-10">
+                <div class="has-text-centered mb-6">
+                    <h1 class="title is-2">{{ .Group.Name }}</h1>
+                    {{ if .Group.Description }}
+                    <p class="subtitle is-5 has-text-grey">{{ .Group.Description }}</p>
+                    {{ end }}
+                    <a href="/dashboard" class="button is-light">
+                        <span class="icon">
+                            <i class="fas fa-arrow-left"></i>
+                        </span>
+                        <span>Back to Dashboard</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Members Section -->
+        <div class="columns is-centered">
+            <div class="column is-10">
+                <h2 class="title is-4 mb-4">Members</h2>
+                <div class="columns is-multiline">
+                    {{ range .Members }}
+                    <div class="column is-one-third-desktop is-half-tablet">
+                        <div class="card">
+                            <div class="card-content">
+                                <div class="media">
+                                    <div class="media-left">
+                                        <span class="icon">
+                                            <i class="fa fa-user-circle" aria-hidden="true"></i>
+                                        </span>
+                                    </div>
+                                    <div class="media-content">
+                                        <p class="title is-5">{{ .Username }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {{ end }}
                 </div>
             </div>
         </div>

@@ -49,7 +49,6 @@ func (t *Templates) Present(w http.ResponseWriter, r *http.Request, name string,
 	}
 
 	if slices.Contains(partialTemplates, name) {
-		log.Println("This is a partial")
 		return tmpl.ExecuteTemplate(w, name, payload)
 	}
 

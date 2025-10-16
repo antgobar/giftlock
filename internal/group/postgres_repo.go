@@ -43,8 +43,14 @@ func (s *PostgresRepo) Create(ctx context.Context, group *model.Group) (*model.G
 }
 
 func (s *PostgresRepo) Delete(ctx context.Context, userID model.UserId, groupID model.GroupId) error {
+	membersSql := `DELETE FROM group_members WHERE group_id = $1;`
+	_, err := s.db.Exec(ctx, membersSql, groupID)
+	if err != nil {
+		return err
+	}
+
 	sql := `DELETE FROM groups WHERE id = $1 AND created_by = $2;`
-	_, err := s.db.Exec(ctx, sql, groupID, userID)
+	_, err = s.db.Exec(ctx, sql, groupID, userID)
 	return err
 }
 
@@ -77,21 +83,40 @@ func (s *PostgresRepo) ListCreated(ctx context.Context, userID model.UserId) ([]
 	return groups, nil
 }
 
-func (s *PostgresRepo) Join(ctx context.Context, userID model.UserId, groupID model.GroupId) error {
+func (s *PostgresRepo) Join(ctx context.Context, userID model.UserId, username string, groupID model.GroupId) error {
 	sql := `
-		INSERT INTO group_members (user_id, group_id)
-		VALUES ($1, $2);
+		INSERT INTO group_members (user_id, username, group_id)
+		VALUES ($1, $2, $3);
 	`
-	_, err := s.db.Exec(ctx, sql, userID, groupID)
+	_, err := s.db.Exec(ctx, sql, userID, username, groupID)
 	return err
 }
 
 func (s *PostgresRepo) GroupDetails(ctx context.Context, groupId model.GroupId) (*model.Group, error) {
-	return &model.Group{}, nil
+	sql := `
+		SELECT id, name, description, created_by, created_at
+		FROM groups
+		WHERE id = $1;
+	`
+	row := s.db.QueryRow(ctx, sql, groupId)
+
+	var group model.Group
+	err := row.Scan(
+		&group.ID,
+		&group.Name,
+		&group.Description,
+		&group.CreatedBy,
+		&group.CreatedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &group, nil
 }
 
 func (s *PostgresRepo) GroupMembers(ctx context.Context, groupId model.GroupId) ([]*model.GroupMember, error) {
-	sql := `SELECT group_members.user_id, group_members.joined_at
+	sql := `SELECT group_members.user_id, group_members.username, group_members.joined_at
 			FROM group_members
 			WHERE group_members.group_id = $1
 	`
@@ -101,16 +126,17 @@ func (s *PostgresRepo) GroupMembers(ctx context.Context, groupId model.GroupId) 
 	}
 	defer rows.Close()
 
-	var groups []*model.GroupMember
+	var groupMembers []*model.GroupMember
 	for rows.Next() {
-		var group model.GroupMember
+		var member model.GroupMember
 		if err := rows.Scan(
-			&group.UserId,
-			&group.JoinedAt,
+			&member.UserId,
+			&member.Username,
+			&member.JoinedAt,
 		); err != nil {
 			return nil, err
 		}
-		groups = append(groups, &group)
+		groupMembers = append(groupMembers, &member)
 	}
-	return groups, nil
+	return groupMembers, nil
 }

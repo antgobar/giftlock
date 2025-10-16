@@ -157,14 +157,13 @@ func (h *Handler) viewGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("Group", groupDetails)
-
 	data := struct {
-		User  *model.User
-		Group *model.Group
+		User    model.User
+		Group   *model.Group
+		Members []*model.GroupMember
 	}{
-		User:  user,
-		Group: &model.Group{Name: "Some Group", Description: "Some desc", CreatedAt: time.Now()},
+		Group:   groupDetails.Group,
+		Members: groupDetails.Members,
 	}
 
 	if err := h.p.Present(w, r, "group", data); err != nil {
