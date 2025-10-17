@@ -150,20 +150,25 @@ func (h *Handler) viewGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	groupDetails, err := h.svc.ViewGroup(ctx, user.ID, groupId)
+	groupMembersDetails, err := h.svc.ViewGroup(ctx, user.ID, groupId)
 	if err != nil {
 		log.Println("ERROR:", err.Error())
-		http.Error(w, "Error fetching group", http.StatusInternalServerError)
+		http.Error(w, "Error fetching group members", http.StatusInternalServerError)
 		return
 	}
 
 	data := struct {
-		User    model.User
-		Group   *model.Group
-		Members []*model.GroupMember
+		User             model.User
+		GroupId          model.GroupId
+		GroupName        string
+		GroupDescription string
+		Members          []*model.GroupMemberDetails
 	}{
-		Group:   groupDetails.Group,
-		Members: groupDetails.Members,
+		User:             *user,
+		GroupId:          groupMembersDetails[0].GroupId,
+		GroupName:        groupMembersDetails[0].GroupName,
+		GroupDescription: groupMembersDetails[0].GroupDescription,
+		Members:          groupMembersDetails,
 	}
 
 	if err := h.p.Present(w, r, "group", data); err != nil {

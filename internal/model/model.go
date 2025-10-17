@@ -39,9 +39,12 @@ type GroupMember struct {
 	JoinedAt time.Time
 }
 
-type GroupDetails struct {
-	Group   *Group
-	Members []*GroupMember
+type GroupMemberDetails struct {
+	GroupId          GroupId
+	GroupName        string
+	GroupDescription string
+	MemberId         UserId
+	MemberUsername   string
 }
 
 type ModelId interface {

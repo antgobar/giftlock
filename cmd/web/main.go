@@ -40,7 +40,7 @@ func main() {
 	groupService := group.NewService(groupRepo)
 	htmlService := presentation.NewHtmlPresentationService()
 
-	userHandler := user.NewHandler(userService)
+	userHandler := user.NewHandler(userService, htmlService)
 	authHandler := auth.NewHandler(authService, htmlService)
 	giftHandler := gift.NewHandler(giftService)
 	groupHandler := group.NewHandler(groupService, htmlService)

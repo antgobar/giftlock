@@ -18,7 +18,6 @@ CREATE TABLE IF NOT EXISTS groups (
 
 CREATE TABLE IF NOT EXISTS group_members (
   user_id uuid REFERENCES users(id) ON DELETE CASCADE,
-  username TEXT,
   group_id uuid REFERENCES groups(id) ON DELETE CASCADE,
   joined_at timestamptz DEFAULT now(),
   PRIMARY KEY (user_id, group_id)

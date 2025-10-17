@@ -26,3 +26,8 @@ down:
 	@echo "Tearing down services..."
 	docker compose down
 	colima stop
+
+clear:
+	@echo "Clearing all containers and images..."
+	make down
+	docker compose down --volumes --remove-orphans

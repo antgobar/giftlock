@@ -83,42 +83,22 @@ func (s *PostgresRepo) ListCreated(ctx context.Context, userID model.UserId) ([]
 	return groups, nil
 }
 
-func (s *PostgresRepo) Join(ctx context.Context, userID model.UserId, username string, groupID model.GroupId) error {
+func (s *PostgresRepo) Join(ctx context.Context, userID model.UserId, groupID model.GroupId) error {
 	sql := `
-		INSERT INTO group_members (user_id, username, group_id)
-		VALUES ($1, $2, $3);
+		INSERT INTO group_members (user_id, group_id)
+		VALUES ($1, $2);
 	`
-	_, err := s.db.Exec(ctx, sql, userID, username, groupID)
+	_, err := s.db.Exec(ctx, sql, userID, groupID)
 	return err
 }
 
-func (s *PostgresRepo) GroupDetails(ctx context.Context, groupId model.GroupId) (*model.Group, error) {
+func (s *PostgresRepo) GroupMemberDetails(ctx context.Context, userID model.UserId, groupId model.GroupId) ([]*model.GroupMemberDetails, error) {
 	sql := `
-		SELECT id, name, description, created_by, created_at
+		SELECT groups.id, groups.name, groups.description, users.id, users.username
 		FROM groups
-		WHERE id = $1;
-	`
-	row := s.db.QueryRow(ctx, sql, groupId)
-
-	var group model.Group
-	err := row.Scan(
-		&group.ID,
-		&group.Name,
-		&group.Description,
-		&group.CreatedBy,
-		&group.CreatedAt,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return &group, nil
-}
-
-func (s *PostgresRepo) GroupMembers(ctx context.Context, groupId model.GroupId) ([]*model.GroupMember, error) {
-	sql := `SELECT group_members.user_id, group_members.username, group_members.joined_at
-			FROM group_members
-			WHERE group_members.group_id = $1
+		JOIN group_members ON groups.id = group_members.group_id
+		JOIN users ON group_members.user_id = users.id
+		WHERE groups.id = $1;
 	`
 	rows, err := s.db.Query(ctx, sql, groupId)
 	if err != nil {
@@ -126,17 +106,20 @@ func (s *PostgresRepo) GroupMembers(ctx context.Context, groupId model.GroupId) 
 	}
 	defer rows.Close()
 
-	var groupMembers []*model.GroupMember
+	var groupMembersDetails []*model.GroupMemberDetails
+
 	for rows.Next() {
-		var member model.GroupMember
+		var groupMemberDetails model.GroupMemberDetails
 		if err := rows.Scan(
-			&member.UserId,
-			&member.Username,
-			&member.JoinedAt,
+			&groupMemberDetails.GroupId,
+			&groupMemberDetails.GroupName,
+			&groupMemberDetails.GroupDescription,
+			&groupMemberDetails.MemberId,
+			&groupMemberDetails.MemberUsername,
 		); err != nil {
 			return nil, err
 		}
-		groupMembers = append(groupMembers, &member)
+		groupMembersDetails = append(groupMembersDetails, &groupMemberDetails)
 	}
-	return groupMembers, nil
+	return groupMembersDetails, nil
 }

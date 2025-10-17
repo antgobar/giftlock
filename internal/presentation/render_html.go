@@ -21,6 +21,7 @@ var pageTemplates []string = []string{
 
 var partialTemplates []string = []string{
 	"groups",
+	"users",
 }
 
 var baseTemplates []string = []string{
