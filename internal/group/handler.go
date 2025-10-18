@@ -27,6 +27,7 @@ func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("DELETE /groups/{id}", h.deleteOwnGroup)
 	mux.HandleFunc("GET /groups/{id}", h.viewGroup)
 	mux.HandleFunc("GET /groups", h.getCreatedGroups)
+	mux.HandleFunc("POST /groups/{id}/add-member/{memberId}", h.addMember)
 }
 
 func (h *Handler) createGroup(w http.ResponseWriter, r *http.Request) {
@@ -160,12 +161,14 @@ func (h *Handler) viewGroup(w http.ResponseWriter, r *http.Request) {
 	data := struct {
 		User             model.User
 		GroupId          model.GroupId
+		GroupCreatorId   model.UserId
 		GroupName        string
 		GroupDescription string
 		Members          []*model.GroupMemberDetails
 	}{
 		User:             *user,
 		GroupId:          groupMembersDetails[0].GroupId,
+		GroupCreatorId:   groupMembersDetails[0].GroupCreatorId,
 		GroupName:        groupMembersDetails[0].GroupName,
 		GroupDescription: groupMembersDetails[0].GroupDescription,
 		Members:          groupMembersDetails,
@@ -175,4 +178,40 @@ func (h *Handler) viewGroup(w http.ResponseWriter, r *http.Request) {
 		log.Println("ERROR:", err.Error())
 		http.Error(w, "Error loading groups page", http.StatusInternalServerError)
 	}
+}
+
+func (h *Handler) addMember(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), time.Duration(time.Second*3))
+	defer cancel()
+
+	user, ok := auth.UserFromContext(r.Context())
+	if !ok {
+		log.Println("ERROR:", "no user in context")
+		http.Error(w, "Error getting user", http.StatusUnauthorized)
+		return
+	}
+
+	groupId, err := model.IdFromString[model.GroupId](r.PathValue("id"))
+	if err != nil {
+		log.Println("ERROR: invalid group id", err)
+		http.Error(w, "Invalid group id", http.StatusBadRequest)
+		return
+	}
+
+	memberId, err := model.IdFromString[model.UserId](r.PathValue("memberId"))
+	if err != nil {
+		log.Println("ERROR: invalid member id", err)
+		http.Error(w, "Invalid member id", http.StatusBadRequest)
+		return
+	}
+
+	err = h.svc.AddMember(ctx, user.ID, memberId, groupId)
+	if err != nil {
+		log.Println("ERROR: adding member to group", err)
+		http.Error(w, "Error adding member", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("HX-Redirect", "/groups/"+groupId.String())
+	w.WriteHeader(http.StatusOK)
 }

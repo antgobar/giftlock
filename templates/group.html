@@ -18,6 +18,7 @@
         </div>
 
         <!-- Add Members Section -->
+        {{ if eq .User.ID .GroupCreatorId }}
         <div class="columns is-centered">
             <div class="column is-10">
                 <div class="box">
@@ -27,7 +28,7 @@
                         <div class="control">
                             <input class="input" type="text" name="usernameSearchTerm"
                                 placeholder="Type username to search..."
-                                hx-post="/users/search/excludeGroup/{{ .GroupId }}"
+                                hx-post="/users/search/exclude-group/{{ .GroupId }}"
                                 hx-trigger="input changed delay:300ms" hx-target="#user-search-results"
                                 hx-indicator="#search-indicator">
                         </div>
@@ -46,6 +47,7 @@
                 </div>
             </div>
         </div>
+        {{ end }}
 
         <!-- Members Section -->
         <div class="columns is-centered">

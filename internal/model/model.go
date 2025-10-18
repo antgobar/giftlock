@@ -41,6 +41,7 @@ type GroupMember struct {
 
 type GroupMemberDetails struct {
 	GroupId          GroupId
+	GroupCreatorId   UserId
 	GroupName        string
 	GroupDescription string
 	MemberId         UserId

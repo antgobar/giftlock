@@ -2,6 +2,7 @@ package group
 
 import (
 	"context"
+	"fmt"
 	"giftlock/internal/model"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -83,18 +84,31 @@ func (s *PostgresRepo) ListCreated(ctx context.Context, userID model.UserId) ([]
 	return groups, nil
 }
 
-func (s *PostgresRepo) Join(ctx context.Context, userID model.UserId, groupID model.GroupId) error {
+func (s *PostgresRepo) AddMember(ctx context.Context, ownerId, memberId model.UserId, groupID model.GroupId) error {
 	sql := `
 		INSERT INTO group_members (user_id, group_id)
-		VALUES ($1, $2);
+		SELECT $1, $2
+		WHERE EXISTS (
+			SELECT 1 FROM groups 
+			WHERE id = $2 AND created_by = $3
+		);
 	`
-	_, err := s.db.Exec(ctx, sql, userID, groupID)
-	return err
+	result, err := s.db.Exec(ctx, sql, memberId, groupID, ownerId)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected := result.RowsAffected()
+	if rowsAffected == 0 {
+		return fmt.Errorf("group not found or user is not the owner")
+	}
+
+	return nil
 }
 
 func (s *PostgresRepo) GroupMemberDetails(ctx context.Context, userID model.UserId, groupId model.GroupId) ([]*model.GroupMemberDetails, error) {
 	sql := `
-		SELECT groups.id, groups.name, groups.description, users.id, users.username
+		SELECT groups.id, groups.created_by, groups.name, groups.description, users.id, users.username
 		FROM groups
 		JOIN group_members ON groups.id = group_members.group_id
 		JOIN users ON group_members.user_id = users.id
@@ -112,6 +126,7 @@ func (s *PostgresRepo) GroupMemberDetails(ctx context.Context, userID model.User
 		var groupMemberDetails model.GroupMemberDetails
 		if err := rows.Scan(
 			&groupMemberDetails.GroupId,
+			&groupMemberDetails.GroupCreatorId,
 			&groupMemberDetails.GroupName,
 			&groupMemberDetails.GroupDescription,
 			&groupMemberDetails.MemberId,

@@ -23,10 +23,14 @@ func (s *Service) CreateAndJoinGroup(ctx context.Context, userID model.UserId, g
 	if err != nil {
 		return nil, err
 	}
-	if err := s.repo.Join(ctx, userID, createdGroup.ID); err != nil {
+	if err := s.repo.AddMember(ctx, userID, userID, createdGroup.ID); err != nil {
 		return nil, err
 	}
 	return createdGroup, nil
+}
+
+func (s *Service) AddMember(ctx context.Context, ownerId, memberId model.UserId, groupId model.GroupId) error {
+	return s.repo.AddMember(ctx, ownerId, memberId, groupId)
 }
 
 func (s *Service) DeleteGroup(ctx context.Context, userId model.UserId, groupID model.GroupId) error {
@@ -35,10 +39,6 @@ func (s *Service) DeleteGroup(ctx context.Context, userId model.UserId, groupID 
 
 func (s *Service) GetCreatedGroups(ctx context.Context, userID model.UserId) ([]*model.Group, error) {
 	return s.repo.ListCreated(ctx, userID)
-}
-
-func (s *Service) JoinGroup(ctx context.Context, userID model.UserId, groupID model.GroupId) error {
-	return s.repo.Join(ctx, userID, groupID)
 }
 
 func (s *Service) ViewGroup(ctx context.Context, userId model.UserId, groupId model.GroupId) ([]*model.GroupMemberDetails, error) {

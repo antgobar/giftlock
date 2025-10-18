@@ -24,7 +24,7 @@ func NewHandler(svc *Service, p presentation.Presenter) *Handler {
 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /register", h.register)
-	mux.HandleFunc("POST /users/search/excludeGroup/{groupId}", h.searchUserNotInGroup)
+	mux.HandleFunc("POST /users/search/exclude-group/{groupId}", h.searchUserNotInGroup)
 }
 
 func (h *Handler) register(w http.ResponseWriter, r *http.Request) {

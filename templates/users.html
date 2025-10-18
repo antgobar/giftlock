@@ -23,12 +23,9 @@
         </div>
         <div class="level-right">
             <div class="level-item">
-                <form hx-post="/groups/{{ $.GroupID }}/add-member" hx-target="#user-search-results">
-                    <input type="hidden" name="user_id" value="{{ .ID }}">
-                    <button class="button is-small is-primary" type="submit">
-                        Add to Group
-                    </button>
-                </form>
+                <button class="button is-small is-primary" hx-post="/groups/{{ $.GroupID }}/add-member/{{ .ID }}">
+                    Add to Group
+                </button>
             </div>
         </div>
     </div>
