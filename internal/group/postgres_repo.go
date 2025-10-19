@@ -44,14 +44,8 @@ func (s *PostgresRepo) Create(ctx context.Context, group *model.Group) (*model.G
 }
 
 func (s *PostgresRepo) Delete(ctx context.Context, userID model.UserId, groupID model.GroupId) error {
-	membersSql := `DELETE FROM group_members WHERE group_id = $1;`
-	_, err := s.db.Exec(ctx, membersSql, groupID)
-	if err != nil {
-		return err
-	}
-
 	sql := `DELETE FROM groups WHERE id = $1 AND created_by = $2;`
-	_, err = s.db.Exec(ctx, sql, groupID, userID)
+	_, err := s.db.Exec(ctx, sql, groupID, userID)
 	return err
 }
 
