@@ -5,7 +5,6 @@
     <p class="subtitle">Create your first gift group above!</p>
 </div>
 {{ else }}
-<h2 class="title is-4">My Groups</h2>
 <div class="columns is-multiline">
     {{ range .Groups }}
     <div class="column is-half" id="group-{{ .ID }}">
@@ -13,23 +12,42 @@
             <div class="card-content">
                 <div class="media">
                     <div class="media-content">
-                        <p class="title is-5">{{ .Name }}</p>
-                        <p class="subtitle is-6">{{ .Description }}</p>
-                        <p class="subtitle is-6">Created: {{ .CreatedAt }}</p>
+                        <div class="is-flex is-justify-content-space-between is-align-items-center mb-2">
+                            <p class="title is-5 mb-0">{{ .Name }}</p>
+                            {{ if eq $.UserId .CreatedBy }}
+                            <span class="tag is-warning is-light">
+                                <span class="icon">
+                                    <i class="fas fa-crown"></i>
+                                </span>
+                                <span>Owner</span>
+                            </span>
+                            {{ end }}
+                        </div>
+                        {{ if .Description }}
+                        <p class="subtitle is-6 mb-2">{{ .Description }}</p>
+                        {{ end }}
+                        <p class="has-text-grey is-size-7">Created: {{ .CreatedAt.Format "2 Jan 2006" }}</p>
                     </div>
                 </div>
                 <div class="content">
                     <div class="buttons">
                         <a href="/groups/{{ .ID }}">
                             <button class="button is-small is-primary">
-                                View Group
+                                <span class="icon">
+                                    <i class="fas fa-arrow-right"></i>
+                                </span>
+                                <span>View Group</span>
                             </button>
                         </a>
-                        <form hx-delete="/groups/{{ .ID }}" hx-target="#group-{{ .ID }}" hx-swap="outerHTML">
-                            <button class="button is-small is-danger">
-                                Delete
-                            </button>
-                        </form>
+                        {{ if eq $.UserId .CreatedBy }}
+                        <button hx-delete="/groups/{{ .ID }}" hx-target="#group-{{ .ID }}" hx-swap="outerHTML"
+                            class="button is-small is-danger">
+                            <span class="icon">
+                                <i class="fas fa-trash"></i>
+                            </span>
+                            <span>Delete</span>
+                        </button>
+                        {{ end }}
                     </div>
                 </div>
             </div>

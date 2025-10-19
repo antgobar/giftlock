@@ -58,7 +58,14 @@ func (h *Handler) register(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) dashboard(w http.ResponseWriter, r *http.Request) {
-	if err := h.presenter.Present(w, r, "dashboard", nil); err != nil {
+	user, _ := auth.UserFromContext(r.Context())
+
+	data := struct {
+		User *model.User
+	}{
+		User: user,
+	}
+	if err := h.presenter.Present(w, r, "dashboard", data); err != nil {
 		log.Println("ERROR:", err.Error())
 		http.Error(w, "Error loading registration page", http.StatusInternalServerError)
 	}

@@ -55,11 +55,12 @@ func (s *PostgresRepo) Delete(ctx context.Context, userID model.UserId, groupID 
 	return err
 }
 
-func (s *PostgresRepo) ListCreated(ctx context.Context, userID model.UserId) ([]*model.Group, error) {
+func (s *PostgresRepo) ListJoined(ctx context.Context, userID model.UserId) ([]*model.Group, error) {
 	sql := `
-		SELECT id, name, description, created_by, created_at
+		SELECT groups.id, groups.name, groups.description, groups.created_by, groups.created_at
 		FROM groups
-		WHERE created_by = $1;
+		INNER JOIN group_members on groups.id = group_members.group_id
+		WHERE group_members.user_id = $1;
 	`
 	rows, err := s.db.Query(ctx, sql, userID)
 	if err != nil {

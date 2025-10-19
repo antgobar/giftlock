@@ -88,7 +88,7 @@ func (h *Handler) getCreatedGroups(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	groups, err := h.svc.GetCreatedGroups(ctx, user.ID)
+	groups, err := h.svc.GetJoinedGroups(ctx, user.ID)
 	if err != nil {
 		log.Println("ERROR:", err.Error())
 		http.Error(w, "Error fetching groups", http.StatusInternalServerError)
@@ -96,8 +96,10 @@ func (h *Handler) getCreatedGroups(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
+		UserId model.UserId
 		Groups []*model.Group
 	}{
+		UserId: user.ID,
 		Groups: groups,
 	}
 	if err := h.p.Present(w, r, "groups", data); err != nil {
