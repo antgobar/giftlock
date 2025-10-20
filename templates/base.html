@@ -22,10 +22,68 @@
     <footer class="footer block">
         <div class="content has-text-centered">
             <p>&copy; <span id="current-year"></span> Gift Lock. All rights reserved.</p>
+            <p><a href="#" onclick="openTermsModal()">Terms and Conditions</a></p>
         </div>
     </footer>
+
+    <!-- Terms and Conditions Modal -->
+    <div id="termsModal" class="modal">
+        <div class="modal-background" onclick="closeTermsModal()"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Terms and Conditions</p>
+                <button class="delete" aria-label="close" onclick="closeTermsModal()"></button>
+            </header>
+            <section class="modal-card-body">
+                <div class="content">
+                    <h4>Disclaimer</h4>
+                    <p>
+                        This application is provided "as is" without any warranties of any kind, either express or
+                        implied.
+                        Gift Lock makes <strong>no guarantees</strong> regarding:
+                    </p>
+                    <ul>
+                        <li><strong>Data Integrity:</strong> While we strive to maintain accurate data, we cannot
+                            guarantee that your information will always be preserved or accurate.</li>
+                        <li><strong>Privacy:</strong> Although we implement security measures and take care to protect
+                            your data, we cannot guarantee complete privacy or security.</li>
+                        <li><strong>Service Availability:</strong> The service may be interrupted, discontinued, or
+                            modified at any time without notice.</li>
+                        <li><strong>Data Loss:</strong> We are not responsible for any loss of data that may occur while
+                            using this service.</li>
+                    </ul>
+                    <p>
+                        By using this application, you acknowledge and accept these limitations. While we make every
+                        effort to provide a reliable service and protect your information using best practices, you use
+                        this application at your own risk.
+                    </p>
+                    <p>
+                        <em>Last updated: October 20, 2025</em>
+                    </p>
+                </div>
+            </section>
+            <footer class="modal-card-foot">
+                <button class="button" onclick="closeTermsModal()">Close</button>
+            </footer>
+        </div>
+    </div>
     <script>
         document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        function openTermsModal() {
+            document.getElementById('termsModal').classList.add('is-active');
+        }
+
+        function closeTermsModal() {
+            document.getElementById('termsModal').classList.remove('is-active');
+        }
+
+        // Close modal when pressing Escape key
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                closeTermsModal();
+            }
+        });
     </script>
 </body>
 
