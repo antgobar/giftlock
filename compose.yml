@@ -17,15 +17,15 @@ services:
       timeout: 5s
       retries: 5
 
-  # app:
-  #   build:
-  #     context: .
-  #   depends_on:
-  #     - giftlock-db
-  #   ports:
-  #     - "8080:8080"
-  #   env_file:
-  #     - .env
+  app:
+    build:
+      context: .
+    depends_on:
+      - giftlock-db
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
 
 
 volumes:
