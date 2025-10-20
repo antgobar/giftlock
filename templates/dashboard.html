@@ -1,0 +1,44 @@
+{{define "content"}}
+<section class="section">
+    <div class="container">
+        <div class="columns is-centered">
+            <div class="column is-10">
+                <div class="has-text-centered mb-5">
+                    <h1 class="title is-3">Your Groups</h1>
+                    <p class="subtitle is-6">Manage your gift exchange groups</p>
+                </div>
+
+                <div class="box">
+                    <h2 class="title is-5">
+                        Create New Group
+                    </h2>
+                    <form method="POST" action="/groups">
+                        <div class="field has-addons">
+                            <div class="control is-expanded">
+                                <input class="input" type="text" name="name" placeholder="Group name" maxlength="255"
+                                    required />
+                            </div>
+                            <div class="control">
+                                <button class="button is-primary" type="submit">
+                                    <span class="icon">
+                                        <i class="fas fa-plus"></i>
+                                    </span>
+                                    <span>Create</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="control">
+                                <input class="input" type="text" name="description"
+                                    placeholder="Description (optional)" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div hx-get="/groups" hx-trigger="load"></div>
+            </div>
+        </div>
+    </div>
+</section>
+{{end}}

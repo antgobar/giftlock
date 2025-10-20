@@ -1,0 +1,80 @@
+{{ define "navbar" }}
+<nav class="navbar is-primary has-shadow" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a href="/" class="navbar-item">
+            <span class="title has-text-white">Gift Lock</span>
+        </a>
+
+        <a role="button" class="navbar-burger" aria-label="menu" id="navbar-burger">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
+
+    <div class="navbar-menu" id="navbar-menu">
+        <div class="navbar-end">
+            {{ if .User }}
+            <a href="/dashboard" class="navbar-item">
+                <span class="icon-text">
+                    <span class="icon">
+                        <i class="fas fa-users"></i>
+                    </span>
+                    <span>Groups</span>
+                </span>
+            </a>
+            <a href="/logout" class="navbar-item">
+                <span class="icon-text">
+                    <span class="icon">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </span>
+                    <span>Logout</span>
+                </span>
+            </a>
+            {{ else }}
+            <a href="/login" class="navbar-item" @click="closeBurger">
+                <span class="icon-text">
+                    <span class="icon">
+                        <i class="fas fa-sign-in-alt"></i>
+                    </span>
+                    <span>Login</span>
+                </span>
+            </a>
+            <a href="/register" class="navbar-item" @click="closeBurger">
+                <span class="icon-text">
+                    <span class="icon">
+                        <i class="fas fa-user-plus"></i>
+                    </span>
+                    <span>Register</span>
+                </span>
+            </a>
+            {{ end }}
+        </div>
+    </div>
+</nav>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Get the navbar burger and menu
+        const burger = document.getElementById('navbar-burger');
+        const menu = document.getElementById('navbar-menu');
+
+        // Add click event listener to the burger
+        burger.addEventListener('click', function () {
+            // Toggle the "is-active" class on both the burger and the menu
+            burger.classList.toggle('is-active');
+            menu.classList.toggle('is-active');
+        });
+
+        // Close menu when clicking on a menu item (for mobile)
+        const menuItems = menu.querySelectorAll('.navbar-item');
+        menuItems.forEach(function (item) {
+            item.addEventListener('click', function () {
+                burger.classList.remove('is-active');
+                menu.classList.remove('is-active');
+            });
+        });
+    });
+</script>
+{{ end }}

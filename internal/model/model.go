@@ -15,6 +15,10 @@ type User struct {
 	CreatedAt      time.Time `json:"createdAt"`
 }
 
+func (u UserId) String() string {
+	return uuid.UUID(u).String()
+}
+
 type GroupId uuid.UUID
 type Group struct {
 	ID          GroupId   `json:"id"`
@@ -24,14 +28,24 @@ type Group struct {
 	CreatedAt   time.Time `json:"createdAt"`
 }
 
-type UserGifts struct {
-	UserId UserId  `json:"userId"`
-	Gifts  []*Gift `json:"userGifts"`
+func (u GroupId) String() string {
+	return uuid.UUID(u).String()
 }
 
-type GroupDetails struct {
-	Group   Group
-	Members []*UserGifts `json:"members"`
+type GroupMember struct {
+	UserId   UserId
+	Username string
+	GroupId  GroupId
+	JoinedAt time.Time
+}
+
+type GroupMemberDetails struct {
+	GroupId          GroupId
+	GroupCreatorId   UserId
+	GroupName        string
+	GroupDescription string
+	MemberId         UserId
+	MemberUsername   string
 }
 
 type ModelId interface {
@@ -67,7 +81,10 @@ type Gift struct {
 	CreatedAt   time.Time  `json:"createdAt"`
 }
 
-// Generic UUID marshaling helpers
+func (u GiftId) String() string {
+	return uuid.UUID(u).String()
+}
+
 func marshalUUID[T ModelId](id T) ([]byte, error) {
 	return json.Marshal(uuid.UUID(id).String())
 }

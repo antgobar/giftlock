@@ -1,14 +1,13 @@
 package session
 
 import (
+	"giftlock/internal/security"
 	"net/http"
 	"time"
 )
 
-const cookieName string = "giftlock_app_session"
-
 func GetCookieValue(request *http.Request) (string, error) {
-	cookie, err := request.Cookie(cookieName)
+	cookie, err := request.Cookie(security.SessionName)
 	if err != nil {
 		return "", err
 	}
@@ -17,9 +16,9 @@ func GetCookieValue(request *http.Request) (string, error) {
 
 func SetCookie(w http.ResponseWriter, token string) {
 	cookie := &http.Cookie{
-		Name:     cookieName,
+		Name:     security.SessionName,
 		Value:    token,
-		Expires:  time.Now().Add(time.Hour * 2),
+		Expires:  security.ExpireInOneYear(),
 		HttpOnly: true,
 		Secure:   true,
 		SameSite: http.SameSiteStrictMode,
@@ -30,7 +29,7 @@ func SetCookie(w http.ResponseWriter, token string) {
 
 func ClearCookie(w http.ResponseWriter) {
 	cookie := &http.Cookie{
-		Name:     cookieName,
+		Name:     security.SessionName,
 		Value:    "",
 		Expires:  time.Unix(0, 0),
 		MaxAge:   -1,

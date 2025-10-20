@@ -9,6 +9,8 @@ import (
 	"giftlock/internal/gift"
 	"giftlock/internal/group"
 	"giftlock/internal/middleware"
+	"giftlock/internal/pages"
+	"giftlock/internal/presentation"
 	"giftlock/internal/server"
 	"giftlock/internal/session"
 	"giftlock/internal/user"
@@ -19,7 +21,7 @@ import (
 
 func main() {
 	log.SetOutput(os.Stdout)
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	log.SetFlags(log.LstdFlags | log.Llongfile)
 	cfg := config.Load()
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*5))
@@ -36,12 +38,14 @@ func main() {
 	authService := auth.NewService(userRepo, sessionRepo)
 	giftService := gift.NewService(giftRepo)
 	groupService := group.NewService(groupRepo)
+	htmlService := presentation.NewHtmlPresentationService()
 
-	userHandler := user.NewHandler(userService)
-	authHandler := auth.NewHandler(authService)
+	userHandler := user.NewHandler(userService, htmlService)
+	authHandler := auth.NewHandler(authService, htmlService)
 	giftHandler := gift.NewHandler(giftService)
-	groupHandler := group.NewHandler(groupService)
+	groupHandler := group.NewHandler(groupService, htmlService)
 	assetsHandler := assets.NewHandler()
+	pagesHandler := pages.NewHandler(htmlService)
 
 	middlewareStack := middleware.LoadMiddleware(sessionRepo, cfg)
 	server := server.NewServer(
@@ -52,6 +56,7 @@ func main() {
 		giftHandler,
 		groupHandler,
 		assetsHandler,
+		pagesHandler,
 	)
 	server.Run()
 }

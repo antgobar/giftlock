@@ -22,15 +22,9 @@ func NewHandler(svc *Service) *Handler {
 }
 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("POST /api/group/{id}/gifts", h.addGiftToWishList)
-	mux.HandleFunc("GET /api/user/me/gifts", h.viewOwnGifts)
-	mux.HandleFunc("GET /api/user/{id}/gifts", h.viewUserGifts)
-}
-
-type createGiftRequest struct {
-	Title       string
-	Description string
-	Link        string
+	mux.HandleFunc("POST /groups/{id}/gifts", h.addGiftToWishList)
+	mux.HandleFunc("GET /user/me/gifts", h.viewOwnGifts)
+	mux.HandleFunc("GET /user/{id}/gifts", h.viewUserGifts)
 }
 
 func (h *Handler) addGiftToWishList(w http.ResponseWriter, r *http.Request) {
@@ -51,22 +45,25 @@ func (h *Handler) addGiftToWishList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req createGiftRequest
-
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request", http.StatusBadRequest)
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Invalid form data", http.StatusBadRequest)
 		return
 	}
 
-	gift, err := h.svc.CreateOwnGift(ctx, user.ID, groupId, req.Link, req.Description, req.Link)
+	giftTitle := r.FormValue("title")
+	giftDescription := r.FormValue("description")
+	giftLink := r.FormValue("link")
+
+	gift, err := h.svc.CreateOwnGift(ctx, user.ID, groupId, giftTitle, giftDescription, giftLink)
 	if err != nil {
 		log.Println("ERROR:", err.Error())
 		http.Error(w, "Error creating gift", http.StatusInternalServerError)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(gift)
+	log.Println("Gift", gift, "created by", user.ID)
+
+	http.Redirect(w, r, "/groups/"+r.PathValue("id"), http.StatusSeeOther)
 }
 
 func (h *Handler) viewOwnGifts(w http.ResponseWriter, r *http.Request) {

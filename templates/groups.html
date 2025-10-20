@@ -1,0 +1,68 @@
+{{define "groups"}}
+{{ if not .Groups }}
+<div class="box has-text-centered">
+    <p class="title is-5">No groups yet</p>
+    <p class="subtitle">Create your first gift group above!</p>
+</div>
+{{ else }}
+<div class="columns is-multiline">
+    {{ range .Groups }}
+    <div class="column is-half" id="group-{{ .ID }}">
+        <div class="card">
+            <div class="card-content">
+                <div class="media">
+                    <div class="media-content">
+                        <div class="is-flex is-justify-content-space-between is-align-items-center mb-2">
+                            <p class="title is-5 mb-0">{{ .Name }}</p>
+                            {{ if eq $.UserId .CreatedBy }}
+                            <span class="tag is-warning is-light">
+                                <span class="icon">
+                                    <i class="fas fa-crown"></i>
+                                </span>
+                                <span>Owner</span>
+                            </span>
+                            {{ end }}
+                        </div>
+                        {{ if .Description }}
+                        <p class="subtitle is-6 mb-2">{{ .Description }}</p>
+                        {{ end }}
+                        <p class="has-text-grey is-size-7">Created: {{ .CreatedAt.Format "2 Jan 2006" }}</p>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="buttons">
+                        <a href="/groups/{{ .ID }}">
+                            <button class="button is-small is-primary">
+                                <span class="icon">
+                                    <i class="fas fa-arrow-right"></i>
+                                </span>
+                                <span>View Group</span>
+                            </button>
+                        </a>
+                        {{ if eq $.UserId .CreatedBy }}
+                        <button hx-delete="/groups/{{ .ID }}" hx-target="#group-{{ .ID }}" hx-swap="outerHTML"
+                            hx-confirm="Are you sure you want to delete this group? All group data will be lost. This action cannot be undone."
+                            class="button is-small is-danger">
+                            <span class="icon">
+                                <i class="fas fa-trash"></i>
+                            </span>
+                            <span>Delete</span>
+                        </button>
+                        {{ else }}
+                        <button hx-post="/groups/{{ .ID }}/leave" hx-target="#group-{{ .ID }}" hx-swap="outerHTML"
+                            hx-confirm="Are you sure you want to leave this group?" class="button is-small is-danger">
+                            <span class="icon">
+                                <i class="fas fa-sign-out-alt"></i>
+                            </span>
+                            <span>Leave</span>
+                        </button>
+                        {{ end }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{ end }}
+</div>
+{{ end }}
+{{end}}

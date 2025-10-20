@@ -1,0 +1,80 @@
+{{ define "content" }}
+<section class="section">
+    <div class="container">
+        <!-- Header Section -->
+        <div class="columns is-centered">
+            <div class="column is-10">
+                <div class="has-text-centered mb-6">
+                    <h1 class="title is-2">{{ .GroupName }}</h1>
+                    <h2 class="subtitle is-5 has-text-grey">{{ .GroupDescription }}</h2>
+                    <a href="/dashboard" class="button is-light">
+                        <span class="icon">
+                            <i class="fas fa-arrow-left"></i>
+                        </span>
+                        <span>Back to Groups</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Members Section -->
+        {{ if eq .User.ID .GroupCreatorId }}
+        <div class="columns is-centered">
+            <div class="column is-10">
+                <div class="box">
+                    <h3 class="title is-5 mb-4">Add New Members</h3>
+                    <div class="field">
+                        <label class="label">Search Users</label>
+                        <div class="control">
+                            <input class="input" type="text" name="usernameSearchTerm"
+                                placeholder="Type username to search..."
+                                hx-post="/users/search/exclude-group/{{ .GroupId }}"
+                                hx-trigger="input changed delay:300ms" hx-target="#user-search-results"
+                                hx-indicator="#search-indicator">
+                        </div>
+                        <div class="mt-2">
+                            <span id="search-indicator" class="htmx-indicator">
+                                <span class="icon">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </span>
+                                Searching...
+                            </span>
+                        </div>
+                    </div>
+                    <div id="user-search-results" class="mt-4">
+                        <!-- Search results will appear here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{ end }}
+
+        <!-- Members Section -->
+        <div class="columns is-centered">
+            <div class="column is-10">
+                <h2 class="title is-4 mb-4">Members</h2>
+                <div class="columns is-multiline">
+                    {{ range .Members }}
+                    <div class="column is-one-third-desktop is-half-tablet">
+                        <div class="card">
+                            <div class="card-content">
+                                <div class="media">
+                                    <div class="media-left">
+                                        <span class="icon">
+                                            <i class="fa fa-user-circle" aria-hidden="true"></i>
+                                        </span>
+                                    </div>
+                                    <div class="media-content">
+                                        <p class="title is-5">{{ .MemberUsername }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {{ end }}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{{ end }}

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"giftlock/internal/model"
 	"giftlock/internal/security"
-	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -34,7 +33,7 @@ func (s *PostgresRepo) Create(ctx context.Context, userId model.UserId) (*model.
 	sesh := model.Session{
 		UserId:    userId,
 		Token:     seshToken,
-		ExpiresAt: time.Now().UTC().Add(3 * time.Hour),
+		ExpiresAt: security.ExpireInOneYear(),
 	}
 
 	row := s.db.QueryRow(ctx, sql, sesh.UserId, sesh.Token, sesh.ExpiresAt)

@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS groups (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   description TEXT,
-  created_by uuid REFERENCES users(id) NOT NULL,
+  created_by uuid REFERENCES users(id) ON DELETE CASCADE NOT NULL,
   created_at timestamptz DEFAULT now()
 );
 
@@ -28,16 +28,16 @@ CREATE TABLE IF NOT EXISTS gifts (
   title text NOT NULL,
   description text,
   link text,
-  group_id uuid REFERENCES groups(id) NOT NULL,
-  created_by uuid REFERENCES users(id) NOT NULL,
-  claimed_by uuid REFERENCES users(id) NULL,
+  group_id uuid REFERENCES groups(id) ON DELETE CASCADE NOT NULL,
+  created_by uuid REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+  claimed_by uuid REFERENCES users(id) ON DELETE SET NULL,
   claimed_at timestamptz,
   created_at timestamptz DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS sessions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid REFERENCES users(id) NOT NULL,
+  user_id uuid REFERENCES users(id) ON DELETE CASCADE NOT NULL,
   token TEXT NOT NULL UNIQUE,
   created_at timestamptz DEFAULT now(),
   expires_at timestamptz NOT NULL
