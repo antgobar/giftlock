@@ -20,8 +20,9 @@ RUN adduser \
 WORKDIR /app
 
 COPY --from=build /bin/giftlock .
+COPY --from=build /app/templates ./templates
 COPY --from=build /app/config ./config
-COPY --from=build /app/assets ./assets
+COPY --from=build /app/static ./static
 COPY --from=build /app/sql ./sql
 
 RUN chown -R appuser:appuser /app
