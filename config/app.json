@@ -1,6 +1,6 @@
 {
-    "serverAddressEnv": "SERVER_ADDR",
-    "databaseUrlEnv": "DATABASE_URL",
+    "serverAddressEnv": "GIFTLOCK_SERVER_ADDR",
+    "databaseUrlEnv": "GIFTLOCK_DATABASE_URL",
     "publicPrefixes": [
         "/static",
         "/login",
