@@ -123,11 +123,11 @@ func (h *Handler) viewGroupMemberGifts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		UserId model.UserId
-		Gifts  []*model.Gift
+		GiftUserId model.UserId
+		Gifts      []*model.Gift
 	}{
-		UserId: user.ID,
-		Gifts:  gifts,
+		GiftUserId: user.ID,
+		Gifts:      gifts,
 	}
 
 	h.p.Present(w, r, "gifts", data)

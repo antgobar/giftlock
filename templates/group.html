@@ -138,18 +138,15 @@
                                         </span>
                                     </div>
                                     <div class="media-content">
-                                        <p class="title is-5">{{ .MemberUsername }}</p>
-                                        {{ if eq $.User.ID .GroupCreatorId }}
-                                        <div class="tags">
-                                            <span class="tag is-info is-light">Group Creator</span>
-                                        </div>
-                                        {{ end }}
+                                        <p class="title is-5">
+                                            {{ .MemberUsername }}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        <div id="gifts-{{.MemberId}}"></div>
                     </div>
-                    <div id="gifts-{{.MemberId}}"></div>
                     {{ end }}
                 </div>
             </div>
