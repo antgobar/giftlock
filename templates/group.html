@@ -121,15 +121,34 @@
             </div>
         </div>
 
+        <!-- Gifts Display Modal -->
+        <div id="gifts-modal" class="modal">
+            <div class="modal-background" onclick="closeGiftsModal()"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title" id="gifts-modal-title">Gifts</p>
+                    <button class="delete" aria-label="close" onclick="closeGiftsModal()"></button>
+                </header>
+                <section class="modal-card-body">
+                    <div id="gifts-modal-content">
+                        <!-- Gifts will be loaded here -->
+                    </div>
+                </section>
+                <footer class="modal-card-foot">
+                    <button class="button" onclick="closeGiftsModal()">Close</button>
+                </footer>
+            </div>
+        </div>
+
         <!-- Members Section -->
         <div class="columns is-centered">
             <div class="column is-10">
                 <h2 class="title is-4 mb-4">Members</h2>
                 <div class="columns is-multiline">
                     {{ range .Members }}
-                    <div class="column is-one-third-desktop is-half-tablet"
-                        hx-get="/groups/{{ .GroupId }}/user/{{ .MemberId }}/gifts" hx-target="#gifts-{{.MemberId}}">
-                        <div class="card">
+                    <div class="column is-half-desktop is-half-tablet">
+                        <div class="card" style="cursor: pointer;"
+                            onclick="openGiftsModal('{{ .MemberUsername }}', '{{ .GroupId }}', '{{ .MemberId }}')">
                             <div class="card-content">
                                 <div class="media">
                                     <div class="media-left">
@@ -145,7 +164,6 @@
                                 </div>
                             </div>
                         </div>
-                        <div id="gifts-{{.MemberId}}"></div>
                     </div>
                     {{ end }}
                 </div>
@@ -180,11 +198,35 @@
         document.getElementById('user-search-results').innerHTML = '';
     }
 
+    function openGiftsModal(username, groupId, memberId) {
+        // Set the modal title
+        document.getElementById('gifts-modal-title').textContent = username + "'s Wishlist";
+
+        // Clear previous content
+        document.getElementById('gifts-modal-content').innerHTML = '<div class="has-text-centered"><span class="icon"><i class="fas fa-spinner fa-spin"></i></span> Loading gifts...</div>';
+
+        // Open the modal
+        document.getElementById('gifts-modal').classList.add('is-active');
+
+        // Load gifts using HTMX
+        htmx.ajax('GET', `/groups/${groupId}/user/${memberId}/gifts`, {
+            target: '#gifts-modal-content',
+            swap: 'innerHTML'
+        });
+    }
+
+    function closeGiftsModal() {
+        document.getElementById('gifts-modal').classList.remove('is-active');
+        // Clear content
+        document.getElementById('gifts-modal-content').innerHTML = '';
+    }
+
     // Close modals on Escape key
     document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape') {
             closeGiftModal();
             closeMembersModal();
+            closeGiftsModal();
         }
     });
 </script>
