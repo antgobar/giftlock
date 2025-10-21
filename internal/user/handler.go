@@ -87,7 +87,7 @@ func (h *Handler) searchUserNotInGroup(w http.ResponseWriter, r *http.Request) {
 		Users:   users,
 		GroupID: groupId,
 	}
-	if err := h.p.Present(w, r, "users", data); err != nil {
+	if err := h.p.Present(w, r, "search_users", data); err != nil {
 		log.Println("ERROR:", err.Error())
 		http.Error(w, "Error loading users page", http.StatusInternalServerError)
 	}
