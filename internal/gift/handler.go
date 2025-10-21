@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"giftlock/internal/auth"
 	"giftlock/internal/model"
+	"giftlock/internal/presentation"
 	"log"
 	"net/http"
 	"time"
@@ -12,19 +13,20 @@ import (
 
 type Handler struct {
 	svc *Service
+	p   presentation.Presenter
 }
 
-func NewHandler(svc *Service) *Handler {
+func NewHandler(svc *Service, p presentation.Presenter) *Handler {
 	if svc == nil {
 		log.Fatalln("User handler is nil")
 	}
-	return &Handler{svc: svc}
+	return &Handler{svc: svc, p: p}
 }
 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /groups/{id}/gifts", h.addGiftToWishList)
 	mux.HandleFunc("GET /user/me/gifts", h.viewOwnGifts)
-	mux.HandleFunc("GET /user/{id}/gifts", h.viewUserGifts)
+	mux.HandleFunc("GET /groups/{groupId}/user/{memberId}/gifts", h.viewGroupMemberGifts)
 }
 
 func (h *Handler) addGiftToWishList(w http.ResponseWriter, r *http.Request) {
@@ -87,23 +89,37 @@ func (h *Handler) viewOwnGifts(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(gifts)
 }
 
-func (h *Handler) viewUserGifts(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) viewGroupMemberGifts(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), time.Duration(time.Second*3))
 	defer cancel()
 
-	userId, err := model.IdFromString[model.UserId](r.PathValue("id"))
+	groupId, err := model.IdFromString[model.GroupId](r.PathValue("groupId"))
+	if err != nil {
+		log.Println("ERROR: invalid group id", err)
+		http.Error(w, "Invalid group id", http.StatusBadRequest)
+		return
+	}
+
+	memberId, err := model.IdFromString[model.UserId](r.PathValue("memberId"))
 	if err != nil {
 		log.Println("ERROR: invalid user id", err)
 		http.Error(w, "Invalid user id", http.StatusBadRequest)
 		return
 	}
-	gifts, err := h.svc.ViewUserGifts(ctx, userId)
+
+	gifts, err := h.svc.ViewGroupUserGifts(ctx, groupId, memberId)
 	if err != nil {
 		log.Println("ERROR:", err.Error())
 		http.Error(w, "Error retrieving gifts", http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(gifts)
+
+	data := struct {
+		Gifts []*model.Gift
+	}{
+		Gifts: gifts,
+	}
+
+	h.p.Present(w, r, "gifts", data)
 
 }

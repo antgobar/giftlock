@@ -72,6 +72,31 @@ func (s *PostgresRepo) GetAllUser(ctx context.Context, userId model.UserId) ([]*
 	return gifts, nil
 }
 
+func (s *PostgresRepo) GetAllGroupUser(ctx context.Context, groupId model.GroupId, userId model.UserId) ([]*model.Gift, error) {
+	sql := `
+		SELECT id, title, description, link
+		FROM gifts
+		WHERE gifts.created_by = $1 AND gifts.group_id = $2
+	`
+	rows, err := s.db.Query(ctx, sql, userId, groupId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve gifts for group: %v, user: %v: %w", groupId, userId, err)
+	}
+	defer rows.Close()
+
+	var gifts = make([]*model.Gift, 0)
+	for rows.Next() {
+		var gift model.Gift
+		if err := rows.Scan(
+			&gift.ID, &gift.Title, &gift.Description, &gift.Link,
+		); err != nil {
+			return nil, fmt.Errorf("failed to scan row: %w", err)
+		}
+		gifts = append(gifts, &gift)
+	}
+	return gifts, nil
+}
+
 func (s *PostgresRepo) Edit(ctx context.Context, gift *model.Gift) (*model.Gift, error) {
 	sql := `
 		UPDATE gifts 

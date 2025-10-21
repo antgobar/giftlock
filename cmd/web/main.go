@@ -42,7 +42,7 @@ func main() {
 
 	userHandler := user.NewHandler(userService, htmlService)
 	authHandler := auth.NewHandler(authService, htmlService)
-	giftHandler := gift.NewHandler(giftService)
+	giftHandler := gift.NewHandler(giftService, htmlService)
 	groupHandler := group.NewHandler(groupService, htmlService)
 	assetsHandler := assets.NewHandler()
 	pagesHandler := pages.NewHandler(htmlService)

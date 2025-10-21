@@ -127,7 +127,8 @@
                 <h2 class="title is-4 mb-4">Members</h2>
                 <div class="columns is-multiline">
                     {{ range .Members }}
-                    <div class="column is-one-third-desktop is-half-tablet">
+                    <div class="column is-one-third-desktop is-half-tablet"
+                        hx-get="/groups/{{ .GroupId }}/user/{{ .MemberId }}/gifts">
                         <div class="card">
                             <div class="card-content">
                                 <div class="media">
@@ -143,6 +144,7 @@
                             </div>
                         </div>
                     </div>
+                    <!-- gifts here -->
                     {{ end }}
                 </div>
             </div>
