@@ -21,7 +21,7 @@
         <div class="columns is-centered">
             <div class="column is-10">
                 <div class="has-text-centered mb-4">
-                    {{ if eq .User.ID .GroupCreatorId }}
+                    {{ if eq $.User.ID .GroupCreatorId }}
                     <button class="button is-info mr-3 mb-3" onclick="openMembersModal()">
                         <span class="icon">
                             <i class="fas fa-user-plus"></i>
@@ -128,7 +128,7 @@
                 <div class="columns is-multiline">
                     {{ range .Members }}
                     <div class="column is-one-third-desktop is-half-tablet"
-                        hx-get="/groups/{{ .GroupId }}/user/{{ .MemberId }}/gifts">
+                        hx-get="/groups/{{ .GroupId }}/user/{{ .MemberId }}/gifts" hx-target="#gifts-{{.MemberId}}">
                         <div class="card">
                             <div class="card-content">
                                 <div class="media">
@@ -139,12 +139,17 @@
                                     </div>
                                     <div class="media-content">
                                         <p class="title is-5">{{ .MemberUsername }}</p>
+                                        {{ if eq $.User.ID .GroupCreatorId }}
+                                        <div class="tags">
+                                            <span class="tag is-info is-light">Group Creator</span>
+                                        </div>
+                                        {{ end }}
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- gifts here -->
+                    <div id="gifts-{{.MemberId}}"></div>
                     {{ end }}
                 </div>
             </div>

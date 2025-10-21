@@ -74,7 +74,7 @@ func (s *PostgresRepo) GetAllUser(ctx context.Context, userId model.UserId) ([]*
 
 func (s *PostgresRepo) GetAllGroupUser(ctx context.Context, groupId model.GroupId, userId model.UserId) ([]*model.Gift, error) {
 	sql := `
-		SELECT id, title, description, link
+		SELECT id, title, description, link, created_by
 		FROM gifts
 		WHERE gifts.created_by = $1 AND gifts.group_id = $2
 	`
@@ -88,44 +88,13 @@ func (s *PostgresRepo) GetAllGroupUser(ctx context.Context, groupId model.GroupI
 	for rows.Next() {
 		var gift model.Gift
 		if err := rows.Scan(
-			&gift.ID, &gift.Title, &gift.Description, &gift.Link,
+			&gift.ID, &gift.Title, &gift.Description, &gift.Link, &gift.CreatedBy,
 		); err != nil {
 			return nil, fmt.Errorf("failed to scan row: %w", err)
 		}
 		gifts = append(gifts, &gift)
 	}
 	return gifts, nil
-}
-
-func (s *PostgresRepo) Edit(ctx context.Context, gift *model.Gift) (*model.Gift, error) {
-	sql := `
-		UPDATE gifts 
-		SET title = $1, description = $2, link = $3
-		WHERE id = $4 AND created_by = $5
-		RETURNING id, title, description, link, created_by, created_at, claimed_by, claimed_at;
-	`
-	row := s.db.QueryRow(ctx, sql,
-		gift.Title,
-		gift.Description,
-		gift.Link,
-		gift.ID,
-		gift.CreatedBy,
-	)
-	var updated model.Gift
-	err := row.Scan(
-		&updated.ID,
-		&updated.Title,
-		&updated.Description,
-		&updated.Link,
-		&updated.CreatedBy,
-		&updated.CreatedAt,
-		&updated.ClaimedBy,
-		&updated.ClaimedAt,
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to update gift: %w", err)
-	}
-	return &updated, nil
 }
 
 func (s *PostgresRepo) Delete(ctx context.Context, giftId model.GiftId, userId model.UserId) error {

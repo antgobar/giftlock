@@ -28,13 +28,6 @@ func (s *Service) ViewGroupUserGifts(ctx context.Context, groupId model.GroupId,
 	return s.repo.GetAllGroupUser(ctx, groupId, userId)
 }
 
-func (s *Service) EditOwnGift(ctx context.Context, userId model.UserId, giftId model.GiftId, title, description, link string) (*model.Gift, error) {
-	gift := model.Gift{
-		Title: title, Description: description, Link: link, CreatedBy: userId, ID: giftId,
-	}
-	return s.repo.Edit(ctx, &gift)
-}
-
 func (s *Service) DeleteGift(ctx context.Context, userId model.UserId, giftId model.GiftId) error {
 	return s.repo.Delete(ctx, giftId, userId)
 }

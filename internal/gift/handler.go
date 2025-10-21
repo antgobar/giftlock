@@ -27,6 +27,7 @@ func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /groups/{id}/gifts", h.addGiftToWishList)
 	mux.HandleFunc("GET /user/me/gifts", h.viewOwnGifts)
 	mux.HandleFunc("GET /groups/{groupId}/user/{memberId}/gifts", h.viewGroupMemberGifts)
+	mux.HandleFunc("DELETE /user/me/gifts/{id}", h.deleteOwnGift)
 }
 
 func (h *Handler) addGiftToWishList(w http.ResponseWriter, r *http.Request) {
@@ -93,6 +94,13 @@ func (h *Handler) viewGroupMemberGifts(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), time.Duration(time.Second*3))
 	defer cancel()
 
+	user, ok := auth.UserFromContext(r.Context())
+	if !ok {
+		log.Println("ERROR:", "no user in context")
+		http.Error(w, "Error getting user", http.StatusUnauthorized)
+		return
+	}
+
 	groupId, err := model.IdFromString[model.GroupId](r.PathValue("groupId"))
 	if err != nil {
 		log.Println("ERROR: invalid group id", err)
@@ -115,11 +123,43 @@ func (h *Handler) viewGroupMemberGifts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		Gifts []*model.Gift
+		UserId model.UserId
+		Gifts  []*model.Gift
 	}{
-		Gifts: gifts,
+		UserId: user.ID,
+		Gifts:  gifts,
 	}
 
 	h.p.Present(w, r, "gifts", data)
 
+}
+
+func (h *Handler) deleteOwnGift(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), time.Duration(time.Second*3))
+	defer cancel()
+
+	user, ok := auth.UserFromContext(r.Context())
+	if !ok {
+		log.Println("ERROR:", "no user in context")
+		http.Error(w, "Error getting user", http.StatusUnauthorized)
+		return
+	}
+
+	giftId, err := model.IdFromString[model.GiftId](r.PathValue("id"))
+	if err != nil {
+		log.Println("ERROR: invalid gift id", err)
+		http.Error(w, "Invalid gift id", http.StatusBadRequest)
+		return
+	}
+
+	err = h.svc.DeleteGift(ctx, user.ID, giftId)
+	if err != nil {
+		log.Println("ERROR:", err.Error())
+		http.Error(w, "Error deleting gift", http.StatusInternalServerError)
+		return
+	}
+
+	log.Println("Gift", giftId, "deleted by", user.ID)
+
+	w.WriteHeader(http.StatusOK)
 }
