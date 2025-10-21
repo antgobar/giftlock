@@ -17,12 +17,13 @@ var pageTemplates []string = []string{
 	"register",
 	"group",
 	"dashboard",
+	"user_gifts",
 }
 
 var partialTemplates []string = []string{
 	"groups",
 	"search_users",
-	"gifts",
+	"group_gifts",
 }
 
 var baseTemplates []string = []string{

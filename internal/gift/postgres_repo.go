@@ -49,8 +49,9 @@ func (s *PostgresRepo) Create(ctx context.Context, gift *model.Gift) (*model.Gif
 
 func (s *PostgresRepo) GetAllUser(ctx context.Context, userId model.UserId) ([]*model.Gift, error) {
 	sql := `
-		SELECT id, title, description, link, claimed_at, created_by
+		SELECT gifts.id, gifts.group_id, gifts.title, gifts.description, gifts.link, gifts.created_by, gifts.created_at, gifts.claimed_by, gifts.claimed_at
 		FROM gifts
+		INNER JOIN groups ON gifts.group_id = groups.id
 		WHERE gifts.created_by = $1
 	`
 	rows, err := s.db.Query(ctx, sql, userId)
@@ -63,7 +64,7 @@ func (s *PostgresRepo) GetAllUser(ctx context.Context, userId model.UserId) ([]*
 	for rows.Next() {
 		var gift model.Gift
 		if err := rows.Scan(
-			&gift.ID, &gift.Title, &gift.Description, &gift.Link, &gift.ClaimedAt, &gift.CreatedBy,
+			&gift.ID, &gift.GroupId, &gift.Title, &gift.Description, &gift.Link, &gift.CreatedBy, &gift.CreatedAt, &gift.ClaimedBy, &gift.ClaimedAt,
 		); err != nil {
 			return nil, fmt.Errorf("failed to scan row: %w", err)
 		}

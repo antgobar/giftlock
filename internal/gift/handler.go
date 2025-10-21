@@ -2,7 +2,6 @@ package gift
 
 import (
 	"context"
-	"encoding/json"
 	"giftlock/internal/auth"
 	"giftlock/internal/model"
 	"giftlock/internal/presentation"
@@ -25,7 +24,7 @@ func NewHandler(svc *Service, p presentation.Presenter) *Handler {
 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /groups/{id}/gifts", h.addGiftToWishList)
-	mux.HandleFunc("GET /user/me/gifts", h.viewOwnGifts)
+	mux.HandleFunc("GET /gifts", h.viewOwnGifts)
 	mux.HandleFunc("GET /groups/{groupId}/user/{memberId}/gifts", h.viewGroupMemberGifts)
 	mux.HandleFunc("DELETE /user/me/gifts/{id}", h.deleteOwnGift)
 }
@@ -86,8 +85,15 @@ func (h *Handler) viewOwnGifts(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error retrieving gifts", http.StatusInternalServerError)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(gifts)
+	data := struct {
+		User  *model.User
+		Gifts []*model.Gift
+	}{
+		User:  user,
+		Gifts: gifts,
+	}
+
+	h.p.Present(w, r, "user_gifts", data)
 }
 
 func (h *Handler) viewGroupMemberGifts(w http.ResponseWriter, r *http.Request) {
@@ -130,7 +136,7 @@ func (h *Handler) viewGroupMemberGifts(w http.ResponseWriter, r *http.Request) {
 		Gifts:      gifts,
 	}
 
-	h.p.Present(w, r, "gifts", data)
+	h.p.Present(w, r, "group_gifts", data)
 
 }
 
