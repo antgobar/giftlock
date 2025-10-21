@@ -17,12 +17,37 @@
             </div>
         </div>
 
-        <!-- Add Members Section -->
-        {{ if eq .User.ID .GroupCreatorId }}
+        <!-- Action Buttons -->
         <div class="columns is-centered">
             <div class="column is-10">
-                <div class="box">
-                    <h3 class="title is-5 mb-4">Add New Members</h3>
+                <div class="has-text-centered mb-4">
+                    {{ if eq .User.ID .GroupCreatorId }}
+                    <button class="button is-info mr-3" onclick="openMembersModal()">
+                        <span class="icon">
+                            <i class="fas fa-user-plus"></i>
+                        </span>
+                        <span>Add Members</span>
+                    </button>
+                    {{ end }}
+                    <button class="button is-primary" onclick="openGiftModal()">
+                        <span class="icon">
+                            <i class="fas fa-gift"></i>
+                        </span>
+                        <span>Add Gift to Wishlist</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Members Modal -->
+        <div id="members-modal" class="modal">
+            <div class="modal-background" onclick="closeMembersModal()"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">Add new members to your group</p>
+                    <button class="delete" aria-label="close" onclick="closeMembersModal()"></button>
+                </header>
+                <section class="modal-card-body">
                     <div class="field">
                         <label class="label">Search Users</label>
                         <div class="control">
@@ -44,10 +69,57 @@
                     <div id="user-search-results" class="mt-4">
                         <!-- Search results will appear here -->
                     </div>
-                </div>
+                </section>
+                <footer class="modal-card-foot">
+                    <button class="button" onclick="closeMembersModal()">Close</button>
+                </footer>
             </div>
         </div>
-        {{ end }}
+
+        <!-- Gift Modal -->
+        <div id="gift-modal" class="modal">
+            <div class="modal-background" onclick="closeGiftModal()"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">Add Gift to Your Wishlist</p>
+                    <button class="delete" aria-label="close" onclick="closeGiftModal()"></button>
+                </header>
+                <section class="modal-card-body">
+                    <form id="gift-form" method="POST" action="/groups/{{ .GroupId }}/gifts">
+                        <div class="field">
+                            <label class="label">Gift Title</label>
+                            <div class="control">
+                                <input class="input" type="text" name="title" placeholder="Enter gift title" required>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label class="label">Description</label>
+                            <div class="control">
+                                <textarea class="textarea" name="description" placeholder="Describe the gift"
+                                    rows="3"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label class="label">Link (optional)</label>
+                            <div class="control">
+                                <input class="input" type="url" name="link" placeholder="https://example.com/product">
+                            </div>
+                        </div>
+                    </form>
+                </section>
+                <footer class="modal-card-foot">
+                    <button class="button is-primary" onclick="submitGiftForm()">
+                        <span class="icon">
+                            <i class="fas fa-gift"></i>
+                        </span>
+                        <span>Add to Wishlist</span>
+                    </button>
+                    <button class="button ml-3" onclick="closeGiftModal()">Cancel</button>
+                </footer>
+            </div>
+        </div>
 
         <!-- Members Section -->
         <div class="columns is-centered">
@@ -77,4 +149,39 @@
         </div>
     </div>
 </section>
+
+<script>
+    function openGiftModal() {
+        document.getElementById('gift-modal').classList.add('is-active');
+    }
+
+    function closeGiftModal() {
+        document.getElementById('gift-modal').classList.remove('is-active');
+        // Reset form
+        document.getElementById('gift-form').reset();
+    }
+
+    function submitGiftForm() {
+        document.getElementById('gift-form').submit();
+    }
+
+    function openMembersModal() {
+        document.getElementById('members-modal').classList.add('is-active');
+    }
+
+    function closeMembersModal() {
+        document.getElementById('members-modal').classList.remove('is-active');
+        // Clear search results and input
+        document.querySelector('input[name="usernameSearchTerm"]').value = '';
+        document.getElementById('user-search-results').innerHTML = '';
+    }
+
+    // Close modals on Escape key
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            closeGiftModal();
+            closeMembersModal();
+        }
+    });
+</script>
 {{ end }}
