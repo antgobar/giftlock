@@ -22,6 +22,11 @@ boot:
 	colima start
 	docker compose up
 
+boot-app:
+	@echo "Booting up services..."
+	colima start
+	docker compose --profile app up
+
 down:
 	@echo "Tearing down services..."
 	docker compose down

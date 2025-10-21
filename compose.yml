@@ -17,7 +17,7 @@ services:
       timeout: 5s
       retries: 5
 
-  app:
+  giftlock-app:
     build:
       context: .
     depends_on:
@@ -26,6 +26,8 @@ services:
       - "8080:8080"
     env_file:
       - .env
+    profiles:
+      - app
 
 
 volumes:
