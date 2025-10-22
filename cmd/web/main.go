@@ -4,6 +4,7 @@ import (
 	"context"
 	"giftlock/internal/assets"
 	"giftlock/internal/auth"
+	"giftlock/internal/claim"
 	"giftlock/internal/config"
 	"giftlock/internal/database"
 	"giftlock/internal/gift"
@@ -33,17 +34,20 @@ func main() {
 	sessionRepo := session.NewPostgresRepository(db.Pool)
 	giftRepo := gift.NewPostgresRepository(db.Pool)
 	groupRepo := group.NewPostgresRepository(db.Pool)
+	claimRepo := claim.NewPostgresRepository(db.Pool)
 
 	userService := user.NewService(userRepo)
 	authService := auth.NewService(userRepo, sessionRepo)
 	giftService := gift.NewService(giftRepo)
 	groupService := group.NewService(groupRepo)
+	claimService := claim.NewService(claimRepo)
 	htmlService := presentation.NewHtmlPresentationService()
 
 	userHandler := user.NewHandler(userService, htmlService)
 	authHandler := auth.NewHandler(authService, htmlService)
 	giftHandler := gift.NewHandler(giftService, htmlService)
 	groupHandler := group.NewHandler(groupService, htmlService)
+	claimHandler := claim.NewHandler(claimService, htmlService)
 	assetsHandler := assets.NewHandler()
 	pagesHandler := pages.NewHandler(htmlService)
 
@@ -55,6 +59,7 @@ func main() {
 		userHandler,
 		giftHandler,
 		groupHandler,
+		claimHandler,
 		assetsHandler,
 		pagesHandler,
 	)

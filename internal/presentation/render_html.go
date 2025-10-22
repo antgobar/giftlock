@@ -18,6 +18,7 @@ var pageTemplates []string = []string{
 	"group",
 	"dashboard",
 	"user_gifts",
+	"user_claims",
 }
 
 var partialTemplates []string = []string{

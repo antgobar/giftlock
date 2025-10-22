@@ -1,0 +1,67 @@
+{{define "content"}}
+<div class="container">
+    <div class="section">
+        <h1 class="title">My Claimed Gifts</h1>
+
+        {{ if .Gifts }}
+        <div class="content">
+            {{ range .Gifts }}
+            <div class="card mb-4" id="gift-{{ .ID }}">
+                <div class="card-content">
+                    <div class="mb-3">
+                        <p class="title is-5 is-inline">{{ .Title }}</p>
+                        {{ if .Link }}
+                        <a href="{{ .Link }}" target="_blank" class="button is-link is-small ml-2">
+                            <span class="icon">
+                                <i class="fas fa-external-link-alt"></i>
+                            </span>
+                            <span>View Link</span>
+                        </a>
+                        {{ end }}
+                    </div>
+
+                    <div class="field is-grouped mb-3">
+                        <div class="control">
+                            <a href="/groups/{{ .GroupId }}" class="button is-info is-small">
+                                <span class="icon">
+                                    <i class="fas fa-users"></i>
+                                </span>
+                                <span>{{ .GroupName }}</span>
+                            </a>
+                        </div>
+                        <div class="control">
+                            <button class="button is-warning is-small" hx-post="/gift/{{ .ID }}/unclaim"
+                                hx-target="#gift-{{ .ID }}" hx-swap="delete"
+                                hx-confirm="Are you sure you want to unclaim this gift?">
+                                <span class="icon">
+                                    <i class="fas fa-times"></i>
+                                </span>
+                                <span>Unclaim</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {{ if .Description }}
+                    <div class="content">
+                        <p>{{ .Description }}</p>
+                    </div>
+                    {{ end }}
+                </div>
+            </div>
+            {{ end }}
+        </div>
+        {{ else }}
+        <div class="notification is-info">
+            <p class="title is-4">No claimed gifts yet!</p>
+            <p>You haven't claimed any gifts yet. Browse groups and claim gifts you'd like to get for others.</p>
+            <a href="/dashboard" class="button is-primary">
+                <span class="icon">
+                    <i class="fas fa-users"></i>
+                </span>
+                <span>Browse Groups</span>
+            </a>
+        </div>
+        {{ end }}
+    </div>
+</div>
+{{end}}

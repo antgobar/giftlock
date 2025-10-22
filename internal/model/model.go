@@ -87,6 +87,7 @@ func (u GiftId) String() string {
 type GroupGift struct {
 	Gift
 	GroupName string
+	UserName  string
 }
 
 func marshalUUID[T ModelId](id T) ([]byte, error) {
