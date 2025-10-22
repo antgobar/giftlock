@@ -10,5 +10,6 @@ type Repository interface {
 	GetAllGroupUser(ctx context.Context, groupId model.GroupId, userId model.UserId) ([]*model.Gift, error)
 	Create(ctx context.Context, gift *model.Gift) (*model.Gift, error)
 	Delete(ctx context.Context, giftId model.GiftId, userId model.UserId) error
-	Claim(ctx context.Context, giftId model.GiftId, userId model.UserId) (*model.Gift, error)
+	Claim(ctx context.Context, giftId model.GiftId, userId model.UserId) error
+	Unclaim(ctx context.Context, giftId model.GiftId, userId model.UserId) error
 }

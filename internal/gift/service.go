@@ -32,6 +32,10 @@ func (s *Service) DeleteGift(ctx context.Context, userId model.UserId, giftId mo
 	return s.repo.Delete(ctx, giftId, userId)
 }
 
-func (s *Service) ClaimGift(ctx context.Context, userId model.UserId, giftId model.GiftId) (*model.Gift, error) {
+func (s *Service) ClaimGift(ctx context.Context, userId model.UserId, giftId model.GiftId) error {
 	return s.repo.Claim(ctx, giftId, userId)
+}
+
+func (s *Service) UnclaimGift(ctx context.Context, userId model.UserId, giftId model.GiftId) error {
+	return s.repo.Unclaim(ctx, giftId, userId)
 }

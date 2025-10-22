@@ -1,4 +1,4 @@
-{{define "group_gifts"}}
+{{define "group_user_gifts"}}
 {{ if not .Gifts }}
 <div class="box has-text-centered">
     <p class="title is-5">No gifts yet</p>
@@ -21,6 +21,7 @@
                             <span>View</span>
                         </a>
                         {{ end }}
+
                         {{ if eq $.GiftUserId .CreatedBy }}
                         <button class="button is-small is-danger" hx-delete="/user/me/gifts/{{ .ID }}"
                             hx-target="#gift-{{ .ID }}" hx-swap="delete"
@@ -31,6 +32,25 @@
                             <span>Delete</span>
                         </button>
                         {{ else }}
+
+                        {{ if .ClaimedBy }}
+                        {{ if eq $.GiftUserId .ClaimedBy }}
+                        <button class="button is-small is-success" hx-post="/gift/{{ .ID }}/unclaim"
+                            hx-target="#gift-{{ .ID }}" hx-swap="outerHTML">
+                            <span class="icon">
+                                <i class="fas fa-times"></i>
+                            </span>
+                            <span>Unclaim</span>
+                        </button>
+                        {{ else }}
+                        <button class="button is-small is-light" disabled>
+                            <span class="icon">
+                                <i class="fas fa-check"></i>
+                            </span>
+                            <span>Claimed</span>
+                        </button>
+                        {{ end }}
+                        {{ else }}
                         <button class="button is-small is-warning" hx-post="/gifts/{{ .ID }}/claim"
                             hx-target="#gift-{{ .ID }}" hx-swap="outerHTML">
                             <span class="icon">
@@ -39,6 +59,8 @@
                             <span>Claim</span>
                         </button>
                         {{ end }}
+                        {{ end }}
+
                     </div>
                 </div>
                 {{ if .Description }}

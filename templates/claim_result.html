@@ -1,0 +1,9 @@
+{{define "claim_result"}}
+<button class="button is-small is-success" hx-post="/gift/{{ .GiftId }}/unclaim" hx-target="#claim-btn-{{ .GiftId }}"
+    hx-swap="outerHTML" id="claim-btn-{{ .GiftId }}">
+    <span class="icon">
+        <i class="fas fa-times"></i>
+    </span>
+    <span>Unclaim</span>
+</button>
+{{end}}

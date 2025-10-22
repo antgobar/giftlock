@@ -27,6 +27,8 @@ func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /gifts", h.viewOwnGifts)
 	mux.HandleFunc("GET /groups/{groupId}/user/{memberId}/gifts", h.viewGroupMemberGifts)
 	mux.HandleFunc("DELETE /user/me/gifts/{id}", h.deleteOwnGift)
+	mux.HandleFunc("POST /gifts/{id}/claim", h.claim)
+	mux.HandleFunc("POST /gift/{id}/unclaim", h.unclaim)
 }
 
 func (h *Handler) addGiftToWishList(w http.ResponseWriter, r *http.Request) {
@@ -136,7 +138,7 @@ func (h *Handler) viewGroupMemberGifts(w http.ResponseWriter, r *http.Request) {
 		Gifts:      gifts,
 	}
 
-	h.p.Present(w, r, "group_gifts", data)
+	h.p.Present(w, r, "group_user_gifts", data)
 
 }
 
@@ -168,4 +170,72 @@ func (h *Handler) deleteOwnGift(w http.ResponseWriter, r *http.Request) {
 	log.Println("Gift", giftId, "deleted by", user.ID)
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func (h *Handler) claim(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), time.Duration(time.Second*3))
+	defer cancel()
+
+	user, ok := auth.UserFromContext(r.Context())
+	if !ok {
+		log.Println("ERROR:", "no user in context")
+		http.Error(w, "Error getting user", http.StatusUnauthorized)
+		return
+	}
+
+	giftId, err := model.IdFromString[model.GiftId](r.PathValue("id"))
+	if err != nil {
+		log.Println("ERROR: invalid gift id", err)
+		http.Error(w, "Invalid gift id", http.StatusBadRequest)
+		return
+	}
+
+	err = h.svc.ClaimGift(ctx, user.ID, giftId)
+	if err != nil {
+		log.Println("ERROR:", err.Error())
+		http.Error(w, "Error claiming gift", http.StatusInternalServerError)
+		return
+	}
+
+	data := struct {
+		GiftId model.GiftId
+	}{
+		GiftId: giftId,
+	}
+
+	h.p.Present(w, r, "claim_result", data)
+}
+
+func (h *Handler) unclaim(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), time.Duration(time.Second*3))
+	defer cancel()
+
+	user, ok := auth.UserFromContext(r.Context())
+	if !ok {
+		log.Println("ERROR:", "no user in context")
+		http.Error(w, "Error getting user", http.StatusUnauthorized)
+		return
+	}
+
+	giftId, err := model.IdFromString[model.GiftId](r.PathValue("id"))
+	if err != nil {
+		log.Println("ERROR: invalid gift id", err)
+		http.Error(w, "Invalid gift id", http.StatusBadRequest)
+		return
+	}
+
+	err = h.svc.UnclaimGift(ctx, user.ID, giftId)
+	if err != nil {
+		log.Println("ERROR:", err.Error())
+		http.Error(w, "Error unclaiming gift", http.StatusInternalServerError)
+		return
+	}
+
+	data := struct {
+		GiftId model.GiftId
+	}{
+		GiftId: giftId,
+	}
+
+	h.p.Present(w, r, "unclaim_result", data)
 }

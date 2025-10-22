@@ -69,15 +69,15 @@ type Session struct {
 
 type GiftId uuid.UUID
 type Gift struct {
-	ID          GiftId     `json:"id"`
-	GroupId     GroupId    `json:"groupId"`
-	Title       string     `json:"title"`
-	Description string     `json:"description"`
-	Link        string     `json:"link"`
-	CreatedBy   UserId     `json:"createdBy"`
-	ClaimedBy   *UserId    `json:"claimedBy,omitempty"`
-	ClaimedAt   *time.Time `json:"claimedAt,omitempty"`
-	CreatedAt   time.Time  `json:"createdAt"`
+	ID          GiftId
+	GroupId     GroupId `json:"groupId"`
+	Title       string  `json:"title"`
+	Description string  `json:"description"`
+	Link        string  `json:"link"`
+	CreatedBy   UserId  `json:"createdBy"`
+	ClaimedBy   *UserId `json:"claimedBy,omitempty"`
+	ClaimedAt   *time.Time
+	CreatedAt   time.Time
 }
 
 func (u GiftId) String() string {

@@ -75,7 +75,7 @@ func (s *PostgresRepo) GetAllUser(ctx context.Context, userId model.UserId) ([]*
 
 func (s *PostgresRepo) GetAllGroupUser(ctx context.Context, groupId model.GroupId, userId model.UserId) ([]*model.Gift, error) {
 	sql := `
-		SELECT id, title, description, link, created_by
+		SELECT id, title, description, link, created_by, claimed_by
 		FROM gifts
 		WHERE gifts.created_by = $1 AND gifts.group_id = $2
 	`
@@ -89,7 +89,7 @@ func (s *PostgresRepo) GetAllGroupUser(ctx context.Context, groupId model.GroupI
 	for rows.Next() {
 		var gift model.Gift
 		if err := rows.Scan(
-			&gift.ID, &gift.Title, &gift.Description, &gift.Link, &gift.CreatedBy,
+			&gift.ID, &gift.Title, &gift.Description, &gift.Link, &gift.CreatedBy, &gift.ClaimedBy,
 		); err != nil {
 			return nil, fmt.Errorf("failed to scan row: %w", err)
 		}
@@ -116,28 +116,52 @@ func (s *PostgresRepo) Delete(ctx context.Context, giftId model.GiftId, userId m
 	return nil
 }
 
-func (s *PostgresRepo) Claim(ctx context.Context, giftId model.GiftId, userId model.UserId) (*model.Gift, error) {
+func (s *PostgresRepo) Claim(ctx context.Context, giftId model.GiftId, userId model.UserId) error {
 	sql := `
 		UPDATE gifts 
 		SET claimed_by = $1, claimed_at = NOW()
-		WHERE id = $2 AND claimed_by IS NULL
-		RETURNING id, title, description, link, created_by, created_at, claimed_by, claimed_at;
+		WHERE id = $2 
+		  AND claimed_by IS NULL
+		  AND EXISTS (
+		    SELECT 1 FROM group_members 
+		    WHERE group_members.group_id = gifts.group_id 
+		      AND group_members.user_id = $1
+		  )
 	`
-	row := s.db.QueryRow(ctx, sql, userId, giftId)
-
-	var claimed model.Gift
-	err := row.Scan(
-		&claimed.ID,
-		&claimed.Title,
-		&claimed.Description,
-		&claimed.Link,
-		&claimed.CreatedBy,
-		&claimed.CreatedAt,
-		&claimed.ClaimedBy,
-		&claimed.ClaimedAt,
-	)
+	result, err := s.db.Exec(ctx, sql, userId, giftId)
 	if err != nil {
-		return nil, fmt.Errorf("failed to claim gift (may already be claimed): %w", err)
+		return fmt.Errorf("failed to claim gift: %w", err)
 	}
-	return &claimed, nil
+
+	rowsAffected := result.RowsAffected()
+	if rowsAffected == 0 {
+		return fmt.Errorf("gift not found, already claimed, or user not a member of the group")
+	}
+
+	return nil
+}
+
+func (s *PostgresRepo) Unclaim(ctx context.Context, giftId model.GiftId, userId model.UserId) error {
+	sql := `
+		UPDATE gifts 
+		SET claimed_by = NULL, claimed_at = NULL
+		WHERE id = $1 
+		  AND claimed_by = $2
+		  AND EXISTS (
+		    SELECT 1 FROM group_members 
+		    WHERE group_members.group_id = gifts.group_id 
+		      AND group_members.user_id = $2
+		  )
+	`
+	result, err := s.db.Exec(ctx, sql, giftId, userId)
+	if err != nil {
+		return fmt.Errorf("failed to unclaim gift: %w", err)
+	}
+
+	rowsAffected := result.RowsAffected()
+	if rowsAffected == 0 {
+		return fmt.Errorf("gift not found, not claimed by this user, or user not a member of the group")
+	}
+
+	return nil
 }
