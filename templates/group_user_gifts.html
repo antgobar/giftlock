@@ -36,7 +36,7 @@
                         {{ if .ClaimedBy }}
                         {{ if eq $.CurrentUserId.String .ClaimedBy.String }}
                         <button class="button is-small is-success" hx-post="/gift/{{ .ID }}/unclaim"
-                            hx-target="#gift-{{ .ID }}" hx-swap="outerHTML">
+                            hx-swap="outerHTML">
                             <span class="icon">
                                 <i class="fas fa-times"></i>
                             </span>
@@ -51,8 +51,7 @@
                         </button>
                         {{ end }}
                         {{ else }}
-                        <button class="button is-small is-warning" hx-post="/gifts/{{ .ID }}/claim"
-                            hx-target="#gift-{{ .ID }}" hx-swap="outerHTML">
+                        <button class="button is-small is-warning" hx-post="/gifts/{{ .ID }}/claim" hx-swap="outerHTML">
                             <span class="icon">
                                 <i class="fas fa-hand-holding-heart"></i>
                             </span>
