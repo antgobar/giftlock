@@ -22,7 +22,7 @@
                         </a>
                         {{ end }}
 
-                        {{ if eq $.GiftUserId .CreatedBy }}
+                        {{ if eq $.CurrentUserId .CreatedBy }}
                         <button class="button is-small is-danger" hx-delete="/user/me/gifts/{{ .ID }}"
                             hx-target="#gift-{{ .ID }}" hx-swap="delete"
                             hx-confirm="Are you sure you want to delete this gift?">
@@ -34,7 +34,7 @@
                         {{ else }}
 
                         {{ if .ClaimedBy }}
-                        {{ if eq $.GiftUserId .ClaimedBy }}
+                        {{ if eq $.CurrentUserId.String .ClaimedBy.String }}
                         <button class="button is-small is-success" hx-post="/gift/{{ .ID }}/unclaim"
                             hx-target="#gift-{{ .ID }}" hx-swap="outerHTML">
                             <span class="icon">
@@ -60,7 +60,6 @@
                         </button>
                         {{ end }}
                         {{ end }}
-
                     </div>
                 </div>
                 {{ if .Description }}

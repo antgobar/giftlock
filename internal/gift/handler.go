@@ -2,6 +2,7 @@ package gift
 
 import (
 	"context"
+	"fmt"
 	"giftlock/internal/auth"
 	"giftlock/internal/model"
 	"giftlock/internal/presentation"
@@ -130,12 +131,16 @@ func (h *Handler) viewGroupMemberGifts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	for _, gift := range gifts {
+		fmt.Println("GIFT:", gift.Title, gift.CreatedBy, gift.ClaimedBy)
+	}
+
 	data := struct {
-		GiftUserId model.UserId
-		Gifts      []*model.Gift
+		CurrentUserId model.UserId
+		Gifts         []*model.Gift
 	}{
-		GiftUserId: user.ID,
-		Gifts:      gifts,
+		CurrentUserId: user.ID,
+		Gifts:         gifts,
 	}
 
 	h.p.Present(w, r, "group_user_gifts", data)
