@@ -20,7 +20,7 @@ func (s *Service) CreateOwnGift(ctx context.Context, userId model.UserId, groupI
 	return s.repo.Create(ctx, &gift)
 }
 
-func (s *Service) ViewUserGifts(ctx context.Context, userId model.UserId) ([]*model.Gift, error) {
+func (s *Service) ViewUserGifts(ctx context.Context, userId model.UserId) ([]*model.GroupGift, error) {
 	return s.repo.GetAllUser(ctx, userId)
 }
 

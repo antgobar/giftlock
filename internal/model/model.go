@@ -74,7 +74,6 @@ type Gift struct {
 	Title       string     `json:"title"`
 	Description string     `json:"description"`
 	Link        string     `json:"link"`
-	Price       float64    `json:"price,omitempty"`
 	CreatedBy   UserId     `json:"createdBy"`
 	ClaimedBy   *UserId    `json:"claimedBy,omitempty"`
 	ClaimedAt   *time.Time `json:"claimedAt,omitempty"`
@@ -83,6 +82,11 @@ type Gift struct {
 
 func (u GiftId) String() string {
 	return uuid.UUID(u).String()
+}
+
+type GroupGift struct {
+	Gift
+	GroupName string
 }
 
 func marshalUUID[T ModelId](id T) ([]byte, error) {

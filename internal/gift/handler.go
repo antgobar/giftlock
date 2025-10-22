@@ -79,7 +79,7 @@ func (h *Handler) viewOwnGifts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	gifts, err := h.svc.ViewUserGifts(ctx, user.ID)
+	groupGifts, err := h.svc.ViewUserGifts(ctx, user.ID)
 	if err != nil {
 		log.Println("ERROR:", err.Error())
 		http.Error(w, "Error retrieving gifts", http.StatusInternalServerError)
@@ -87,10 +87,10 @@ func (h *Handler) viewOwnGifts(w http.ResponseWriter, r *http.Request) {
 	}
 	data := struct {
 		User  *model.User
-		Gifts []*model.Gift
+		Gifts []*model.GroupGift
 	}{
 		User:  user,
-		Gifts: gifts,
+		Gifts: groupGifts,
 	}
 
 	h.p.Present(w, r, "user_gifts", data)

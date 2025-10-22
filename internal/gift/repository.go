@@ -6,7 +6,7 @@ import (
 )
 
 type Repository interface {
-	GetAllUser(ctx context.Context, userId model.UserId) ([]*model.Gift, error)
+	GetAllUser(ctx context.Context, userId model.UserId) ([]*model.GroupGift, error)
 	GetAllGroupUser(ctx context.Context, groupId model.GroupId, userId model.UserId) ([]*model.Gift, error)
 	Create(ctx context.Context, gift *model.Gift) (*model.Gift, error)
 	Delete(ctx context.Context, giftId model.GiftId, userId model.UserId) error

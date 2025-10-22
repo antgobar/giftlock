@@ -4,61 +4,48 @@
         <h1 class="title">My Gifts</h1>
 
         {{ if .Gifts }}
-        <div class="columns is-multiline">
+        <div class="content">
             {{ range .Gifts }}
-            <div class="column is-half">
-                <div class="card">
-                    <div class="card-content">
-                        <div class="media">
-                            <div class="media-content">
-                                <p class="title is-4">{{ .Title }}</p>
-                                {{ if .Description }}
-                                <p class="subtitle is-6">{{ .Description }}</p>
-                                {{ end }}
-                            </div>
+            <div class="card mb-4">
+                <div class="card-content">
+                    <div class="mb-3">
+                        <p class="title is-5 is-inline">{{ .Title }}</p>
+                        {{ if .Link }}
+                        <a href="{{ .Link }}" target="_blank" class="button is-link is-small ml-2">
+                            <span class="icon">
+                                <i class="fas fa-external-link-alt"></i>
+                            </span>
+                            <span>View Link</span>
+                        </a>
+                        {{ end }}
+                    </div>
+
+                    <div class="field is-grouped mb-3">
+                        <div class="control">
+                            <a href="/groups/{{ .GroupId }}" class="button is-info is-small">
+                                <span class="icon">
+                                    <i class="fas fa-users"></i>
+                                </span>
+                                <span>{{ .GroupName }}</span>
+                            </a>
                         </div>
-
-                        <div class="content">
-                            {{ if .Link }}
-                            <p>
-                                <strong>Link:</strong>
-                                <a href="{{ .Link }}" target="_blank" class="has-text-link">
-                                    <span class="icon-text">
-                                        <span class="icon is-small">
-                                            <i class="fas fa-external-link-alt"></i>
-                                        </span>
-                                        <span>View Item</span>
-                                    </span>
-                                </a>
-                            </p>
-                            {{ end }}
-
-                            <div class="field is-grouped">
-                                <div class="control">
-                                    <a href="/groups/{{ .GroupId }}" class="button is-primary is-small">
-                                        <span class="icon">
-                                            <i class="fas fa-users"></i>
-                                        </span>
-                                        <span>View Group</span>
-                                    </a>
-                                </div>
-                                <div class="control">
-                                    <button class="button is-danger is-small" hx-delete="/user/me/gifts/{{ .ID }}"
-                                        hx-confirm="Are you sure you want to delete this gift?"
-                                        hx-target="closest .column" hx-swap="outerHTML">
-                                        <span class="icon">
-                                            <i class="fas fa-trash"></i>
-                                        </span>
-                                        <span>Delete</span>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <small class="has-text-grey">
-                                Created: {{ .CreatedAt.Format "Jan 2, 2006" }}
-                            </small>
+                        <div class="control">
+                            <button class="button is-danger is-small" hx-delete="/user/me/gifts/{{ .ID }}"
+                                hx-confirm="Are you sure you want to delete this gift?" hx-target="closest .card"
+                                hx-swap="outerHTML">
+                                <span class="icon">
+                                    <i class="fas fa-trash"></i>
+                                </span>
+                                <span>Delete</span>
+                            </button>
                         </div>
                     </div>
+
+                    {{ if .Description }}
+                    <div class="content">
+                        <p>{{ .Description }}</p>
+                    </div>
+                    {{ end }}
                 </div>
             </div>
             {{ end }}
