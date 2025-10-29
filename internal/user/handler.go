@@ -39,6 +39,16 @@ func (h *Handler) register(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 
+	if username == "" {
+		http.Error(w, "Username is required", http.StatusBadRequest)
+		return
+	}
+
+	if password == "" {
+		http.Error(w, "Password is required", http.StatusBadRequest)
+		return
+	}
+
 	err := h.svc.Register(ctx, username, password)
 
 	if errors.Is(err, ErrUsernameTaken) {
