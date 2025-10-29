@@ -19,5 +19,6 @@ func (s *Service) Register(ctx context.Context, username, password string) error
 }
 
 func (s *Service) SearchUserNotInGroup(ctx context.Context, groupId model.GroupId, username string) ([]*model.User, error) {
-	return s.repo.SearchUserNotInGroup(ctx, groupId, username)
+	limit := 1
+	return s.repo.SearchUserNotInGroup(ctx, groupId, username, limit)
 }

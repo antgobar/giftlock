@@ -95,7 +95,7 @@ func (s *PostgresRepo) GetFromCreds(ctx context.Context, username string, passwo
 	return &user, nil
 }
 
-func (s *PostgresRepo) SearchUserNotInGroup(ctx context.Context, groupId model.GroupId, username string) ([]*model.User, error) {
+func (s *PostgresRepo) SearchUserNotInGroup(ctx context.Context, groupId model.GroupId, username string, limit int) ([]*model.User, error) {
 	sql := `
 		SELECT id, username
 		FROM users 
@@ -106,9 +106,10 @@ func (s *PostgresRepo) SearchUserNotInGroup(ctx context.Context, groupId model.G
 			WHERE group_id = $2
 		)
 		ORDER BY username
+		LIMIT $3
 	`
 	searchPattern := "%" + username + "%"
-	rows, err := s.db.Query(ctx, sql, searchPattern, groupId)
+	rows, err := s.db.Query(ctx, sql, searchPattern, groupId, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -125,6 +126,70 @@ func (s *PostgresRepo) SearchUserNotInGroup(ctx context.Context, groupId model.G
 
 	if err := rows.Err(); err != nil {
 		return nil, err
+	}
+
+	return users, nil
+}
+
+func (s *PostgresRepo) SearchByUsername(ctx context.Context, username string) (*model.User, error) {
+	sql := `
+		SELECT id, username
+		FROM users 
+		WHERE username = $1
+	`
+
+	user := model.User{}
+	row := s.db.QueryRow(ctx, sql, username)
+	if err := row.Scan(&user.ID, &user.Username, &user.HashedPassword, &user.CreatedAt); err != nil {
+		if isNoRowsFoundError(err) {
+			return nil, ErrUserNotExists
+		}
+		return nil, fmt.Errorf("failed to find user with username %s: %w", username, err)
+	}
+
+	return &user, nil
+}
+
+func (s *PostgresRepo) Delete(ctx context.Context, userId model.UserId) error {
+	sql := `DELETE FROM users WHERE id = $1`
+
+	result, err := s.db.Exec(ctx, sql, userId)
+	if err != nil {
+		return fmt.Errorf("failed to delete user with id %d: %w", userId, err)
+	}
+
+	rowsAffected := result.RowsAffected()
+	if rowsAffected == 0 {
+		return ErrUserNotExists
+	}
+
+	return nil
+}
+
+func (s *PostgresRepo) List(ctx context.Context) ([]*model.User, error) {
+	sql := `
+		SELECT id, username, created_at, role
+		FROM users 
+		ORDER BY username
+	`
+
+	rows, err := s.db.Query(ctx, sql)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list users: %w", err)
+	}
+	defer rows.Close()
+
+	var users []*model.User
+	for rows.Next() {
+		user := &model.User{}
+		if err := rows.Scan(&user.ID, &user.Username, &user.CreatedAt, &user.Role); err != nil {
+			return nil, fmt.Errorf("failed to scan user: %w", err)
+		}
+		users = append(users, user)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating over users: %w", err)
 	}
 
 	return users, nil

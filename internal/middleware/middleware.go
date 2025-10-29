@@ -40,10 +40,11 @@ func loggingMiddleware(next http.Handler) http.Handler {
 func (h *SessionHandler) authMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		cookieVal, err := session.GetCookieValue(r)
-		publicPath := isPublicPath(r.URL.Path, h.cfg.PublicPrefixes)
+		isPublicPath := isPathPublic(r.URL.Path, h.cfg.PublicPrefixes)
+		isAdminPath := isPathAdmin(r.URL.Path)
 
 		if err != nil {
-			if publicPath {
+			if isPublicPath {
 				next.ServeHTTP(w, r)
 				return
 			}
@@ -57,11 +58,16 @@ func (h *SessionHandler) authMiddleware(next http.Handler) http.Handler {
 		token := model.SessionToken(cookieVal)
 		user, err := h.sessions.GetUserFromToken(ctx, token)
 		if err != nil {
-			if publicPath {
+			if isPublicPath {
 				next.ServeHTTP(w, r)
 				return
 			}
 			log.Println(err.Error())
+			http.Error(w, "Unauthenticated", http.StatusUnauthorized)
+			return
+		}
+		log.Println("USER:", user.Username, "ROLE", user.Role)
+		if isAdminPath && user.Role != "admin" {
 			http.Error(w, "Unauthenticated", http.StatusUnauthorized)
 			return
 		}
@@ -82,7 +88,7 @@ func createMiddlewareStack(xs ...Middleware) Middleware {
 	}
 }
 
-func isPublicPath(path string, publicPrefixes []string) bool {
+func isPathPublic(path string, publicPrefixes []string) bool {
 	if path == "/" {
 		return true
 	}
@@ -92,4 +98,8 @@ func isPublicPath(path string, publicPrefixes []string) bool {
 		}
 	}
 	return false
+}
+
+func isPathAdmin(path string) bool {
+	return strings.HasPrefix(path, "/admin")
 }

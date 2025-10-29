@@ -9,10 +9,11 @@ import (
 
 type UserId uuid.UUID
 type User struct {
-	ID             UserId    `json:"id"`
-	Username       string    `json:"username"`
-	HashedPassword string    `json:"-"`
-	CreatedAt      time.Time `json:"createdAt"`
+	ID             UserId
+	Username       string
+	HashedPassword string
+	CreatedAt      time.Time
+	Role           string
 }
 
 func (u UserId) String() string {

@@ -19,6 +19,7 @@ var pageTemplates []string = []string{
 	"dashboard",
 	"user_gifts",
 	"user_claims",
+	"admin",
 }
 
 var partialTemplates []string = []string{
@@ -27,6 +28,7 @@ var partialTemplates []string = []string{
 	"group_user_gifts",
 	"claim_result",
 	"unclaim_result",
+	"users",
 }
 
 var baseTemplates []string = []string{

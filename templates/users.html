@@ -1,0 +1,83 @@
+{{define "users"}}
+<div class="content">
+    <h3 class="title is-5">Users ({{len .Users}})</h3>
+    {{if .Users}}
+    <div class="table-container">
+        <table class="table is-fullwidth is-striped is-hoverable">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Created At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{range .Users}}
+                <tr>
+                    <td>
+                        <span class="icon-text">
+                            <span class="icon">
+                                <i class="fas fa-user"></i>
+                            </span>
+                            <span>{{.Username}}</span>
+                        </span>
+                    </td>
+                    <td>
+                        {{if eq .Role "admin"}}
+                        <span class="tag is-danger">
+                            <span class="icon">
+                                <i class="fas fa-crown"></i>
+                            </span>
+                            <span>Admin</span>
+                        </span>
+                        {{else}}
+                        <span class="tag is-info">
+                            <span class="icon">
+                                <i class="fas fa-user"></i>
+                            </span>
+                            <span>User</span>
+                        </span>
+                        {{end}}
+                    </td>
+                    <td>
+                        <time datetime="{{.CreatedAt.Format " 2006-01-02T15:04:05Z07:00"}}">
+                            {{.CreatedAt.Format "Jan 2, 2006 at 3:04 PM"}}
+                        </time>
+                    </td>
+                    <td>
+                        <div class="buttons are-small">
+                            <button class="button is-info is-outlined" title="View Details">
+                                <span class="icon">
+                                    <i class="fas fa-eye"></i>
+                                </span>
+                            </button>
+                            {{if ne .Role "admin"}}
+                            <button class="button is-warning is-outlined" title="Edit User">
+                                <span class="icon">
+                                    <i class="fas fa-edit"></i>
+                                </span>
+                            </button>
+                            <button class="button is-danger is-outlined" title="Delete User">
+                                <span class="icon">
+                                    <i class="fas fa-trash"></i>
+                                </span>
+                            </button>
+                            {{end}}
+                        </div>
+                    </td>
+                </tr>
+                {{end}}
+            </tbody>
+        </table>
+    </div>
+    {{else}}
+    <div class="notification is-info">
+        <span class="icon">
+            <i class="fas fa-info-circle"></i>
+        </span>
+        No users found.
+    </div>
+    {{end}}
+</div>
+{{end}}

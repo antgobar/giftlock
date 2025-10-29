@@ -1,12 +1,15 @@
 BEGIN;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- users table
+
 CREATE TABLE IF NOT EXISTS users (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   username TEXT NOT NULL UNIQUE,
   hashed_password TEXT NOT NULL,
   created_at timestamptz DEFAULT now()
 );
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'user' NOT NULL;
 
 CREATE TABLE IF NOT EXISTS groups (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),

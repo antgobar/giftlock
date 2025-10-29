@@ -16,6 +16,17 @@
     <div class="navbar-menu" id="navbar-menu">
         <div class="navbar-end">
             {{ if .User }}
+            {{ if .User.Role | eq "admin" }}
+            <a href="/admin" class="navbar-item">
+                <span class="icon-text">
+                    <span class="icon">
+                        <i class="fas fa-cog"></i>
+                    </span>
+                    <span>Admin</span>
+                </span>
+            </a>
+            {{ end }}
+
             <a href="/dashboard" class="navbar-item">
                 <span class="icon-text">
                     <span class="icon">

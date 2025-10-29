@@ -1,0 +1,17 @@
+{{define "content"}}
+<div class="section">
+    <div class="container">
+        <h1 class="title is-2">Admin Panel</h1>
+        <p class="subtitle">Welcome, Admin!</p>
+
+        <div class="box">
+            <h2 class="title is-4">User Management</h2>
+            <div id="users-container" hx-get="/admin/users" hx-trigger="load" hx-target="#users-container">
+                <div class="has-text-centered">
+                    <i class="fas fa-spinner fa-spin"></i> Loading users...
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}

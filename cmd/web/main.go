@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"giftlock/internal/admin"
 	"giftlock/internal/assets"
 	"giftlock/internal/auth"
 	"giftlock/internal/claim"
@@ -36,6 +37,7 @@ func main() {
 	groupRepo := group.NewPostgresRepository(db.Pool)
 	claimRepo := claim.NewPostgresRepository(db.Pool)
 
+	adminService := admin.NewService(userRepo)
 	userService := user.NewService(userRepo)
 	authService := auth.NewService(userRepo, sessionRepo)
 	giftService := gift.NewService(giftRepo)
@@ -43,6 +45,7 @@ func main() {
 	claimService := claim.NewService(claimRepo)
 	htmlService := presentation.NewHtmlPresentationService()
 
+	adminHandler := admin.NewHandler(adminService, htmlService)
 	userHandler := user.NewHandler(userService, htmlService)
 	authHandler := auth.NewHandler(authService, htmlService)
 	giftHandler := gift.NewHandler(giftService, htmlService)
@@ -56,6 +59,7 @@ func main() {
 		cfg.ServerAddr,
 		middlewareStack,
 		authHandler,
+		adminHandler,
 		userHandler,
 		giftHandler,
 		groupHandler,

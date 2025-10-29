@@ -73,7 +73,7 @@ func (h *Handler) searchUserNotInGroup(w http.ResponseWriter, r *http.Request) {
 
 	usernameSearchTerm := r.FormValue("usernameSearchTerm")
 
-	users, err := h.svc.repo.SearchUserNotInGroup(ctx, groupId, usernameSearchTerm)
+	users, err := h.svc.SearchUserNotInGroup(ctx, groupId, usernameSearchTerm)
 	if err != nil {
 		log.Println("ERROR:", err)
 		http.Error(w, "Internal server error", http.StatusInternalServerError)
