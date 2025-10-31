@@ -5,6 +5,7 @@
         "/static",
         "/login",
         "/logout",
-        "/register"
+        "/register",
+        "/users/search/check_username_exists"
     ]
 }

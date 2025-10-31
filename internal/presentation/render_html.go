@@ -29,6 +29,8 @@ var partialTemplates []string = []string{
 	"claim_result",
 	"unclaim_result",
 	"users",
+	"username_taken",
+	"username_valid",
 }
 
 var baseTemplates []string = []string{

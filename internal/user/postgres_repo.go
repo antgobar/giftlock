@@ -136,15 +136,17 @@ func (s *PostgresRepo) SearchByUsername(ctx context.Context, username string) (*
 		SELECT id, username
 		FROM users 
 		WHERE username = $1
+		LIMIT 1
 	`
 
 	user := model.User{}
 	row := s.db.QueryRow(ctx, sql, username)
-	if err := row.Scan(&user.ID, &user.Username, &user.HashedPassword, &user.CreatedAt); err != nil {
-		if isNoRowsFoundError(err) {
+	if err := row.Scan(&user.ID, &user.Username); err != nil {
+		log.Printf("Scan error: %T, %v", err, err)
+		if err == pgx.ErrNoRows {
 			return nil, ErrUserNotExists
 		}
-		return nil, fmt.Errorf("failed to find user with username %s: %w", username, err)
+		return nil, err
 	}
 
 	return &user, nil

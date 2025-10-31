@@ -1,0 +1,14 @@
+{{ define "username_valid" }}
+<div class="field" id="username-check">
+    <label class="label" for="username">Username</label>
+    <div class="control has-icons-right">
+        <input class="input is-success" type="text" id="username" name="username" placeholder="Enter your username"
+            value={{.Username}} hx-post="/users/search/check_username_exists" hx-trigger="keyup changed delay:200ms"
+            hx-target="#username-check" hx-swap="innerHTML" />
+        <span class="icon is-small is-right">
+            <i class="fas fa-check" style="color: white;"></i>
+        </span>
+    </div>
+    <p class="help is-success">Valid username</p>
+</div>
+{{ end }}

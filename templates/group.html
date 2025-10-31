@@ -47,7 +47,7 @@
                         <div class="control">
                             <input class="input" type="text" name="usernameSearchTerm"
                                 placeholder="Type username to search..."
-                                hx-post="/users/search/exclude-group/{{ .GroupId }}"
+                                hx-post="/users/search/exclude_group/{{ .GroupId }}"
                                 hx-trigger="input changed delay:300ms" hx-target="#user-search-results"
                                 hx-indicator="#search-indicator">
                         </div>

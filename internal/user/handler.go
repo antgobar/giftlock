@@ -24,7 +24,8 @@ func NewHandler(svc *Service, p presentation.Presenter) *Handler {
 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /register", h.register)
-	mux.HandleFunc("POST /users/search/exclude-group/{groupId}", h.searchUserNotInGroup)
+	mux.HandleFunc("POST /users/search/exclude_group/{groupId}", h.searchUserNotInGroup)
+	mux.HandleFunc("POST /users/search/check_username_exists", h.checkUsernameExists)
 }
 
 func (h *Handler) register(w http.ResponseWriter, r *http.Request) {
@@ -101,4 +102,39 @@ func (h *Handler) searchUserNotInGroup(w http.ResponseWriter, r *http.Request) {
 		log.Println("ERROR:", err.Error())
 		http.Error(w, "Error loading users page", http.StatusInternalServerError)
 	}
+}
+
+func (h *Handler) checkUsernameExists(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), time.Second*3)
+	defer cancel()
+
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Invalid form data", http.StatusBadRequest)
+		return
+	}
+
+	username := r.FormValue("username")
+	if username == "" {
+		http.Error(w, "Username is required", http.StatusBadRequest)
+		return
+	}
+
+	data := struct {
+		Username string
+	}{
+		Username: username,
+	}
+
+	exists, err := h.svc.CheckUsernameExists(ctx, username)
+	if err != nil {
+		log.Printf("ERROR: checking username exists '%s': %v", username, err)
+		h.p.Present(w, r, "username_valid", data)
+		return
+	}
+
+	if exists {
+		h.p.Present(w, r, "username_taken", data)
+		return
+	}
+	h.p.Present(w, r, "username_valid", data)
 }
