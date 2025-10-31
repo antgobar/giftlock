@@ -165,6 +165,14 @@
                                     <div class="media-content">
                                         <p class="title is-5 mb-1">
                                             {{ .MemberUsername }}
+                                            {{ if eq .MemberId $.GroupCreatorId }}
+                                            <span class="tag is-warning is-light">
+                                                <span class="icon">
+                                                    <i class="fas fa-crown"></i>
+                                                </span>
+                                                <span>Owner</span>
+                                            </span>
+                                            {{ end }}
                                             {{ if eq .MemberId $.User.ID }}
                                             <span class="tag is-primary is-small ml-2">You</span>
                                             {{ end }}
