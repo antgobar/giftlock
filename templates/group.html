@@ -144,12 +144,6 @@
         <div class="columns is-centered">
             <div class="column is-10">
                 <h2 class="title is-4 mb-4">Members</h2>
-                <p class="subtitle is-6 has-text-grey mb-4">
-                    <span class="icon">
-                        <i class="fas fa-info-circle"></i>
-                    </span>
-                    Click on a member's card to view their wishlist or add to your own list.
-                </p>
                 <div class="columns is-multiline">
                     {{ range .Members }}
                     <div class="column is-half-desktop is-half-tablet">
@@ -175,7 +169,11 @@
                                             <span class="icon is-small">
                                                 <i class="fas fa-gift"></i>
                                             </span>
+                                            {{ if eq .MemberId $.User.ID }}
+                                            View and edit your wishlist
+                                            {{ else }}
                                             View wishlist
+                                            {{ end }}
                                         </p>
                                     </div>
                                     <div class="media-right">
