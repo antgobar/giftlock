@@ -18,26 +18,20 @@
         </div>
 
         <!-- Action Buttons -->
+        {{ if eq $.User.ID .GroupCreatorId }}
         <div class="columns is-centered">
             <div class="column is-10">
                 <div class="has-text-centered mb-4">
-                    {{ if eq $.User.ID .GroupCreatorId }}
                     <button class="button is-info mr-3 mb-3" onclick="openMembersModal()">
                         <span class="icon">
                             <i class="fas fa-user-plus"></i>
                         </span>
                         <span>Add Members</span>
                     </button>
-                    {{ end }}
-                    <button class="button is-primary" onclick="openGiftModal()">
-                        <span class="icon">
-                            <i class="fas fa-gift"></i>
-                        </span>
-                        <span>Add a gift to this group</span>
-                    </button>
                 </div>
             </div>
         </div>
+        {{ end }}
 
         <!-- Members Modal -->
         <div id="members-modal" class="modal">
@@ -126,7 +120,17 @@
             <div class="modal-background" onclick="closeGiftsModal()"></div>
             <div class="modal-card">
                 <header class="modal-card-head">
-                    <p class="modal-card-title" id="gifts-modal-title">Gifts</p>
+                    <div style="width: 100%;">
+                        <p class="modal-card-title" id="gifts-modal-title">Gifts</p>
+                        <div id="add-gift-btn-header" style="display: none; margin-top: 0.5rem;">
+                            <button class="button is-primary is-small">
+                                <span class="icon is-small">
+                                    <i class="fas fa-gift"></i>
+                                </span>
+                                <span>Add a gift</span>
+                            </button>
+                        </div>
+                    </div>
                     <button class="delete" aria-label="close" onclick="closeGiftsModal()"></button>
                 </header>
                 <section class="modal-card-body">
@@ -197,6 +201,13 @@
         document.getElementById('gift-modal').classList.add('is-active');
     }
 
+    function openGiftModalFromGifts() {
+        // Close the gifts modal first
+        closeGiftsModal();
+        // Then open the gift form modal
+        openGiftModal();
+    }
+
     function closeGiftModal() {
         document.getElementById('gift-modal').classList.remove('is-active');
         // Reset form
@@ -224,6 +235,18 @@
 
         // Clear previous content
         document.getElementById('gifts-modal-content').innerHTML = '<div class="has-text-centered"><span class="icon"><i class="fas fa-spinner fa-spin"></i></span> Loading gifts...</div>';
+
+        // Show/hide the "Add a gift" button based on whether this is the current user's modal
+        const addGiftBtnContainer = document.getElementById('add-gift-btn-header');
+        const addGiftBtn = addGiftBtnContainer.querySelector('button');
+        const currentUserId = '{{ $.User.ID }}';
+        if (memberId === currentUserId) {
+            addGiftBtnContainer.style.display = 'block';
+            // Set the click handler
+            addGiftBtn.onclick = openGiftModalFromGifts;
+        } else {
+            addGiftBtnContainer.style.display = 'none';
+        }
 
         // Open the modal
         document.getElementById('gifts-modal').classList.add('is-active');
