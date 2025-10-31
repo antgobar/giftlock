@@ -67,14 +67,14 @@ func (h *Handler) createGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := h.svc.CreateAndJoinGroup(ctx, user.ID, groupName, groupDescription)
+	group, err := h.svc.CreateAndJoinGroup(ctx, user.ID, groupName, groupDescription)
 	if err != nil {
 		log.Println("ERROR:", err.Error())
 		http.Error(w, "Error creating group", http.StatusInternalServerError)
 		return
 	}
 
-	http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
+	http.Redirect(w, r, "/groups/"+group.ID.String(), http.StatusSeeOther)
 }
 
 func (h *Handler) getCreatedGroups(w http.ResponseWriter, r *http.Request) {
