@@ -148,7 +148,7 @@
                     <span class="icon">
                         <i class="fas fa-info-circle"></i>
                     </span>
-                    Click on a member's card to view their wishlist
+                    Click on a member's card to view their wishlist or add to your own list.
                 </p>
                 <div class="columns is-multiline">
                     {{ range .Members }}
@@ -165,7 +165,12 @@
                                         </figure>
                                     </div>
                                     <div class="media-content">
-                                        <p class="title is-5 mb-1">{{ .MemberUsername }}</p>
+                                        <p class="title is-5 mb-1">
+                                            {{ .MemberUsername }}
+                                            {{ if eq .MemberId $.User.ID }}
+                                            <span class="tag is-primary is-small ml-2">You</span>
+                                            {{ end }}
+                                        </p>
                                         <p class="subtitle is-6 has-text-grey">
                                             <span class="icon is-small">
                                                 <i class="fas fa-gift"></i>
