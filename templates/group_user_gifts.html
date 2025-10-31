@@ -9,61 +9,62 @@
     <div class="column is-full" id="gift-{{ .ID }}">
         <div class="card">
             <div class="card-content">
-                <div class="is-flex is-justify-content-space-between is-align-items-center mb-3">
-                    <p class="title is-5 mb-0">{{ .Title }}</p>
-                    <div class="buttons">
-                        {{ if .Link }}
-                        <a href="{{ .Link }}" target="_blank" rel="noopener noreferrer"
-                            class="button is-small is-primary">
-                            <span class="icon">
-                                <i class="fas fa-external-link-alt"></i>
-                            </span>
-                            <span>View</span>
-                        </a>
-                        {{ end }}
+                <!-- Title at the top -->
+                <p class="title is-5 mb-3">{{ .Title }}</p>
 
-                        {{ if eq $.CurrentUserId .CreatedBy }}
-                        <button class="button is-small is-danger" hx-delete="/user/me/gifts/{{ .ID }}"
-                            hx-target="#gift-{{ .ID }}" hx-swap="delete"
-                            hx-confirm="Are you sure you want to delete this gift?">
-                            <span class="icon">
-                                <i class="fas fa-trash"></i>
-                            </span>
-                            <span>Delete</span>
-                        </button>
-                        {{ else }}
-
-                        {{ if .ClaimedBy }}
-                        {{ if eq $.CurrentUserId.String .ClaimedBy.String }}
-                        <button class="button is-small is-success" hx-post="/gift/{{ .ID }}/unclaim"
-                            hx-swap="outerHTML">
-                            <span class="icon">
-                                <i class="fas fa-times"></i>
-                            </span>
-                            <span>Unclaim</span>
-                        </button>
-                        {{ else }}
-                        <button class="button is-small is-light" disabled>
-                            <span class="icon">
-                                <i class="fas fa-check"></i>
-                            </span>
-                            <span>Claimed</span>
-                        </button>
-                        {{ end }}
-                        {{ else }}
-                        <button class="button is-small is-warning" hx-post="/gifts/{{ .ID }}/claim" hx-swap="outerHTML">
-                            <span class="icon">
-                                <i class="fas fa-hand-holding-heart"></i>
-                            </span>
-                            <span>Claim</span>
-                        </button>
-                        {{ end }}
-                        {{ end }}
-                    </div>
-                </div>
+                <!-- Description in the middle -->
                 {{ if .Description }}
-                <p class="subtitle is-6 mb-3">{{ .Description }}</p>
+                <p class="subtitle is-6 mb-4">{{ .Description }}</p>
                 {{ end }}
+
+                <!-- Buttons at the bottom, side by side but responsive -->
+                <div class="buttons is-flex-wrap-wrap">
+                    {{ if .Link }}
+                    <a href="{{ .Link }}" target="_blank" rel="noopener noreferrer" class="button is-small is-primary">
+                        <span class="icon">
+                            <i class="fas fa-external-link-alt"></i>
+                        </span>
+                        <span>View</span>
+                    </a>
+                    {{ end }}
+
+                    {{ if eq $.CurrentUserId .CreatedBy }}
+                    <button class="button is-small is-danger" hx-delete="/user/me/gifts/{{ .ID }}"
+                        hx-target="#gift-{{ .ID }}" hx-swap="delete"
+                        hx-confirm="Are you sure you want to delete this gift?">
+                        <span class="icon">
+                            <i class="fas fa-trash"></i>
+                        </span>
+                        <span>Delete</span>
+                    </button>
+                    {{ else }}
+
+                    {{ if .ClaimedBy }}
+                    {{ if eq $.CurrentUserId.String .ClaimedBy.String }}
+                    <button class="button is-small is-success" hx-post="/gift/{{ .ID }}/unclaim" hx-swap="outerHTML">
+                        <span class="icon">
+                            <i class="fas fa-times"></i>
+                        </span>
+                        <span>Unclaim</span>
+                    </button>
+                    {{ else }}
+                    <button class="button is-small is-light" disabled>
+                        <span class="icon">
+                            <i class="fas fa-check"></i>
+                        </span>
+                        <span>Claimed</span>
+                    </button>
+                    {{ end }}
+                    {{ else }}
+                    <button class="button is-small is-warning" hx-post="/gifts/{{ .ID }}/claim" hx-swap="outerHTML">
+                        <span class="icon">
+                            <i class="fas fa-hand-holding-heart"></i>
+                        </span>
+                        <span>Claim</span>
+                    </button>
+                    {{ end }}
+                    {{ end }}
+                </div>
             </div>
         </div>
     </div>
