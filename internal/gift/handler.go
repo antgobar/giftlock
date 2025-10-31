@@ -2,7 +2,6 @@ package gift
 
 import (
 	"context"
-	"fmt"
 	"giftlock/internal/auth"
 	"giftlock/internal/model"
 	"giftlock/internal/presentation"
@@ -129,10 +128,6 @@ func (h *Handler) viewGroupMemberGifts(w http.ResponseWriter, r *http.Request) {
 		log.Println("ERROR:", err.Error())
 		http.Error(w, "Error retrieving gifts", http.StatusInternalServerError)
 		return
-	}
-
-	for _, gift := range gifts {
-		fmt.Println("GIFT:", gift.Title, gift.CreatedBy, gift.ClaimedBy)
 	}
 
 	data := struct {
