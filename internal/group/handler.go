@@ -160,6 +160,15 @@ func (h *Handler) viewGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Reorder so current user is at the top
+	for i, member := range groupMembersDetails {
+		if member.MemberId == user.ID {
+			// Move current user to front
+			groupMembersDetails[0], groupMembersDetails[i] = groupMembersDetails[i], groupMembersDetails[0]
+			break
+		}
+	}
+
 	data := struct {
 		User             model.User
 		GroupId          model.GroupId
