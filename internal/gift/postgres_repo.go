@@ -19,16 +19,17 @@ func NewPostgresRepository(db *pgxpool.Pool) *PostgresRepo {
 func (s *PostgresRepo) Create(ctx context.Context, gift *model.Gift) (*model.Gift, error) {
 	sql := `
 		INSERT INTO gifts (
-			group_id, title, description, link, created_by
+			group_id, title, description, link, price, created_by
 		) VALUES (
-			$1, $2, $3, $4, $5
-		) RETURNING id, group_id, title, description, link, created_by, created_at;
+			$1, $2, $3, $4, $5, $6
+		) RETURNING id, group_id, title, description, link, price, created_by, created_at;
 	`
 	row := s.db.QueryRow(ctx, sql,
 		gift.GroupId,
 		gift.Title,
 		gift.Description,
 		gift.Link,
+		gift.Price,
 		gift.CreatedBy,
 	)
 	var created model.Gift
@@ -38,6 +39,7 @@ func (s *PostgresRepo) Create(ctx context.Context, gift *model.Gift) (*model.Gif
 		&created.Title,
 		&created.Description,
 		&created.Link,
+		&created.Price,
 		&created.CreatedBy,
 		&created.CreatedAt,
 	)
@@ -75,7 +77,7 @@ func (s *PostgresRepo) GetAllUser(ctx context.Context, userId model.UserId) ([]*
 
 func (s *PostgresRepo) GetAllGroupUser(ctx context.Context, groupId model.GroupId, userId model.UserId) ([]*model.Gift, error) {
 	sql := `
-		SELECT id, title, description, link, created_by, claimed_by
+		SELECT id, title, description, link, price, created_by, claimed_by
 		FROM gifts
 		WHERE gifts.created_by = $1 AND gifts.group_id = $2
 	`
@@ -89,7 +91,7 @@ func (s *PostgresRepo) GetAllGroupUser(ctx context.Context, groupId model.GroupI
 	for rows.Next() {
 		var gift model.Gift
 		if err := rows.Scan(
-			&gift.ID, &gift.Title, &gift.Description, &gift.Link, &gift.CreatedBy, &gift.ClaimedBy,
+			&gift.ID, &gift.Title, &gift.Description, &gift.Link, &gift.Price, &gift.CreatedBy, &gift.ClaimedBy,
 		); err != nil {
 			return nil, fmt.Errorf("failed to scan row: %w", err)
 		}

@@ -17,6 +17,10 @@
                 <p class="subtitle is-6 mb-4">{{ .Description }}</p>
                 {{ end }}
 
+                {{ if .Price }}
+                <p class="subtitle is-6 mb-4">Price: ${{ .Price }}</p>
+                {{ end }}
+
                 <!-- Buttons at the bottom, side by side but responsive -->
                 <div class="buttons is-flex-wrap-wrap">
                     {{ if .Link }}

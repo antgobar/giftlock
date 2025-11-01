@@ -3,11 +3,11 @@
 
 TODO:
 
-- [ ] In register, poll for username availability
-- [ ] Price field for gifts
 - [ ] Create gifts ideas on behalf of users e.g. parents creating gifts for kids
 - [ ] Able to upload images for gifts
 - [ ] Reset password in dashboard
+- [x] Price field for gifts
+- [x] In register, poll for username availability
 - [x] User card at the top of the group page
 - [x] Icon showing group owner
 - [x] Gift card title, buttons and description on separate lines

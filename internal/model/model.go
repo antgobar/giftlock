@@ -22,11 +22,11 @@ func (u UserId) String() string {
 
 type GroupId uuid.UUID
 type Group struct {
-	ID          GroupId   `json:"id"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	CreatedBy   UserId    `json:"createdBy"`
-	CreatedAt   time.Time `json:"createdAt"`
+	ID          GroupId
+	Name        string
+	Description string
+	CreatedBy   UserId
+	CreatedAt   time.Time
 }
 
 func (u GroupId) String() string {
@@ -61,22 +61,23 @@ func IdFromString[T ModelId](id string) (T, error) {
 type SessionID uuid.UUID
 type SessionToken string
 type Session struct {
-	ID        SessionID    `json:"id"`
-	UserId    UserId       `json:"userId"`
-	Token     SessionToken `json:"token"`
-	CreatedAt time.Time    `json:"createdAt"`
-	ExpiresAt time.Time    `json:"expiresAt"`
+	ID        SessionID
+	UserId    UserId
+	Token     SessionToken
+	CreatedAt time.Time
+	ExpiresAt time.Time
 }
 
 type GiftId uuid.UUID
 type Gift struct {
 	ID          GiftId
-	GroupId     GroupId `json:"groupId"`
-	Title       string  `json:"title"`
-	Description string  `json:"description"`
-	Link        string  `json:"link"`
-	CreatedBy   UserId  `json:"createdBy"`
-	ClaimedBy   *UserId `json:"claimedBy,omitempty"`
+	GroupId     GroupId
+	Title       string
+	Description string
+	Link        string
+	Price       float32
+	CreatedBy   UserId
+	ClaimedBy   *UserId
 	ClaimedAt   *time.Time
 	CreatedAt   time.Time
 }

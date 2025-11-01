@@ -7,6 +7,7 @@ import (
 	"giftlock/internal/presentation"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -55,10 +56,21 @@ func (h *Handler) addGiftToWishList(w http.ResponseWriter, r *http.Request) {
 	}
 
 	giftTitle := r.FormValue("title")
+	if giftTitle == "" {
+		http.Error(w, "Must at least provide title", http.StatusBadRequest)
+		return
+	}
 	giftDescription := r.FormValue("description")
 	giftLink := r.FormValue("link")
 
-	gift, err := h.svc.CreateOwnGift(ctx, user.ID, groupId, giftTitle, giftDescription, giftLink)
+	giftPrice, err := strconv.ParseFloat(r.FormValue("price"), 32)
+	if err != nil {
+		log.Println("ERROR:", err.Error())
+		http.Error(w, "Price must be numeric", http.StatusBadRequest)
+		return
+	}
+
+	gift, err := h.svc.CreateOwnGift(ctx, user.ID, groupId, giftTitle, giftDescription, giftLink, float32(giftPrice))
 	if err != nil {
 		log.Println("ERROR:", err.Error())
 		http.Error(w, "Error creating gift", http.StatusInternalServerError)

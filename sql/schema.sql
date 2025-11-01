@@ -6,10 +6,9 @@ CREATE TABLE IF NOT EXISTS users (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   username TEXT NOT NULL UNIQUE,
   hashed_password TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'user',
   created_at timestamptz DEFAULT now()
 );
-
-ALTER TABLE users ADD COLUMN IF NOT EXISTS role TEXT DEFAULT 'user' NOT NULL;
 
 CREATE TABLE IF NOT EXISTS groups (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -37,6 +36,9 @@ CREATE TABLE IF NOT EXISTS gifts (
   claimed_at timestamptz,
   created_at timestamptz DEFAULT now()
 );
+
+ALTER TABLE gifts ADD COLUMN IF NOT EXISTS price numeric;
+ALTER TABLE gifts ALTER COLUMN price SET DEFAULT 0;
 
 CREATE TABLE IF NOT EXISTS sessions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
