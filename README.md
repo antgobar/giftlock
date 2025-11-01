@@ -3,10 +3,10 @@
 
 TODO:
 
-- [ ] User able to leave group
 - [ ] Create gifts ideas on behalf of users e.g. parents creating gifts for kids
 - [ ] Able to upload images for gifts
 - [ ] Reset password in dashboard
+- [x] User able to leave group
 - [x] Price field for gifts
 - [x] In register, poll for username availability
 - [x] User card at the top of the group page

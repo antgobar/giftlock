@@ -28,6 +28,7 @@ func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("GET /groups/{id}", h.viewGroup)
 	mux.HandleFunc("GET /groups", h.getCreatedGroups)
 	mux.HandleFunc("POST /groups/{id}/add-member/{memberId}", h.addMember)
+	mux.HandleFunc("POST /groups/{id}/leave", h.leaveGroup)
 }
 
 func (h *Handler) createGroup(w http.ResponseWriter, r *http.Request) {
@@ -224,5 +225,34 @@ func (h *Handler) addMember(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("HX-Redirect", "/groups/"+groupId.String())
+	w.WriteHeader(http.StatusOK)
+}
+
+func (h *Handler) leaveGroup(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), time.Duration(time.Second*3))
+	defer cancel()
+
+	user, ok := auth.UserFromContext(r.Context())
+	if !ok {
+		log.Println("ERROR:", "no user in context")
+		http.Error(w, "Error getting user", http.StatusUnauthorized)
+		return
+	}
+
+	groupId, err := model.IdFromString[model.GroupId](r.PathValue("id"))
+	if err != nil {
+		log.Println("ERROR: invalid group id", err)
+		http.Error(w, "Invalid group id", http.StatusBadRequest)
+		return
+	}
+
+	err = h.svc.LeaveGroup(ctx, user.ID, groupId)
+	if err != nil {
+		log.Println("ERROR: leaving group", err)
+		http.Error(w, "Error leaving group", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("HX-Redirect", "/dashboard")
 	w.WriteHeader(http.StatusOK)
 }

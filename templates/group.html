@@ -81,7 +81,8 @@
                 <section class="modal-card-body">
                     <form id="gift-form" method="POST" action="/groups/{{ .GroupId }}/gifts">
                         <div class="field">
-                            <label class="label">Gift Title</label>
+                            <label class="label">Gift Title <span class="has-text-danger is-size-5"
+                                    title="Required">*</span></label>
                             <div class="control">
                                 <input class="input" type="text" name="title" placeholder="Enter gift title" required>
                             </div>
@@ -96,13 +97,13 @@
                         </div>
 
                         <div class="field">
-                            <label class="label">Link (optional)</label>
+                            <label class="label">Link</label>
                             <div class="control">
                                 <input class="input" type="url" name="link" placeholder="https://example.com/product">
                             </div>
                         </div>
                         <div class="field">
-                            <label class="label">Price (optional)</label>
+                            <label class="label">Price</label>
                             <div class="control">
                                 <input class="input" type="number" name="price" min="0" step="0.01"
                                     placeholder="e.g. 19.99">

@@ -2,15 +2,17 @@ package group
 
 import (
 	"context"
+	"giftlock/internal/gift"
 	"giftlock/internal/model"
 )
 
 type Service struct {
-	repo Repository
+	repo     Repository
+	giftRepo gift.Repository
 }
 
-func NewService(r Repository) *Service {
-	return &Service{repo: r}
+func NewService(r Repository, giftRepo gift.Repository) *Service {
+	return &Service{repo: r, giftRepo: giftRepo}
 }
 
 func (s *Service) CreateAndJoinGroup(ctx context.Context, userID model.UserId, groupName, groupDescription string) (*model.Group, error) {
@@ -47,4 +49,18 @@ func (s *Service) ViewGroup(ctx context.Context, userId model.UserId, groupId mo
 		return nil, err
 	}
 	return groupMembersDetails, nil
+}
+
+func (s *Service) LeaveGroup(ctx context.Context, userId model.UserId, groupID model.GroupId) error {
+	userGifts, err := s.giftRepo.GetAllGroupUser(ctx, groupID, userId)
+	if err != nil {
+		return err
+	}
+	for _, gift := range userGifts {
+		err = s.giftRepo.Delete(ctx, gift.ID, userId)
+		if err != nil {
+			return err
+		}
+	}
+	return s.repo.Leave(ctx, userId, groupID)
 }

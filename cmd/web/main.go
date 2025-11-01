@@ -41,7 +41,7 @@ func main() {
 	userService := user.NewService(userRepo)
 	authService := auth.NewService(userRepo, sessionRepo)
 	giftService := gift.NewService(giftRepo)
-	groupService := group.NewService(groupRepo)
+	groupService := group.NewService(groupRepo, giftRepo)
 	claimService := claim.NewService(claimRepo)
 	htmlService := presentation.NewHtmlPresentationService()
 

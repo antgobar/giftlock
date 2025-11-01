@@ -133,3 +133,15 @@ func (s *PostgresRepo) GroupMemberDetails(ctx context.Context, userID model.User
 	}
 	return groupMembersDetails, nil
 }
+
+func (s *PostgresRepo) Leave(ctx context.Context, userID model.UserId, groupID model.GroupId) error {
+	sql := `DELETE FROM group_members WHERE user_id = $1 AND group_id = $2;`
+	result, err := s.db.Exec(ctx, sql, userID, groupID)
+	if err != nil {
+		return err
+	}
+	if result.RowsAffected() == 0 {
+		return fmt.Errorf("user is not a member of the group or group does not exist")
+	}
+	return nil
+}
