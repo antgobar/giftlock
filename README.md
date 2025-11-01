@@ -3,6 +3,7 @@
 
 TODO:
 
+- [ ] User able to leave group
 - [ ] Create gifts ideas on behalf of users e.g. parents creating gifts for kids
 - [ ] Able to upload images for gifts
 - [ ] Reset password in dashboard
