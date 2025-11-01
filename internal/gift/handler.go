@@ -63,11 +63,18 @@ func (h *Handler) addGiftToWishList(w http.ResponseWriter, r *http.Request) {
 	giftDescription := r.FormValue("description")
 	giftLink := r.FormValue("link")
 
-	giftPrice, err := strconv.ParseFloat(r.FormValue("price"), 32)
-	if err != nil {
-		log.Println("ERROR:", err.Error())
-		http.Error(w, "Price must be numeric", http.StatusBadRequest)
-		return
+	var giftPrice float64
+
+	giftPriceStr := r.FormValue("price")
+	if giftPriceStr == "" {
+		giftPrice = 0
+	} else {
+		giftPrice, err = strconv.ParseFloat(r.FormValue("price"), 32)
+		if err != nil {
+			log.Println("ERROR:", err.Error())
+			http.Error(w, "Price must be numeric", http.StatusBadRequest)
+			return
+		}
 	}
 
 	gift, err := h.svc.CreateOwnGift(ctx, user.ID, groupId, giftTitle, giftDescription, giftLink, float32(giftPrice))
