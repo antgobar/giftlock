@@ -31,6 +31,7 @@ var partialTemplates []string = []string{
 	"users",
 	"username_taken",
 	"username_valid",
+	"update_group",
 }
 
 var baseTemplates []string = []string{

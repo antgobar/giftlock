@@ -12,4 +12,5 @@ type Repository interface {
 	AddMember(ctx context.Context, ownerId, memberId model.UserId, groupID model.GroupId) error
 	GroupMemberDetails(ctx context.Context, userID model.UserId, groupId model.GroupId) ([]*model.GroupMemberDetails, error)
 	Leave(ctx context.Context, userId model.UserId, groupID model.GroupId) error
+	UpdateName(ctx context.Context, createdBy model.UserId, groupID model.GroupId, newName string) (string, error)
 }

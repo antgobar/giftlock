@@ -5,7 +5,18 @@
         <div class="columns is-centered">
             <div class="column is-10">
                 <div class="has-text-centered mb-6">
-                    <h1 class="title is-2">{{ .GroupName }}</h1>
+                    <h1 id="group-name" class="title is-2" style="display: inline-block; vertical-align: middle;">
+                        {{ .GroupName }}
+                        {{ if eq $.User.ID .GroupCreatorId }}
+                        <button id="edit-group-btn" class="button is-small is-light"
+                            style="vertical-align: middle; margin-left: 8px; padding: 0.3em 0.5em;"
+                            title="Edit group name" onclick="showEditGroupForm()">
+                            <span class="icon is-small">
+                                <i class="fas fa-edit"></i>
+                            </span>
+                        </button>
+                        {{ end }}
+                    </h1>
                     <h2 class="subtitle is-5 has-text-grey">{{ .GroupDescription }}</h2>
                     <a href="/dashboard" class="button is-light">
                         <span class="icon">
@@ -214,6 +225,41 @@
 </section>
 
 <script>
+    function showEditGroupForm() {
+        const groupNameElem = document.getElementById('group-name');
+        const editBtn = document.getElementById('edit-group-btn');
+        groupNameElem.style.display = 'none';
+        editBtn.style.display = 'none';
+        const formHtml = `
+            <form id="edit-group-form" style="display:inline-block; vertical-align: middle;"
+                hx-put="/groups/{{ .GroupId }}/edit-name"
+                hx-target="this" hx-swap="outerHTML">
+                <input class="input is-medium" type="text" name="name" value="{{ .GroupName }}" style="width: 350px; max-width: 100%; display:inline-block;">
+                <button type="submit" class="button is-success is-medium ml-2" style="vertical-align: middle;" title="Save">
+                    <span class="icon is-small">
+                        <i class="fas fa-check"></i>
+                    </span>
+                </button>
+                <button type="button" class="button is-light is-medium ml-1" style="vertical-align: middle;" title="Cancel" onclick="cancelEditGroupForm()">
+                    <span class="icon is-small">
+                        <i class="fas fa-times"></i>
+                    </span>
+                </button>
+            </form>
+        `;
+        groupNameElem.insertAdjacentHTML('afterend', formHtml);
+        htmx.process(document.getElementById('edit-group-form'));
+    }
+
+    function cancelEditGroupForm() {
+        // Remove the form
+        const form = document.getElementById('edit-group-form');
+        if (form) form.remove();
+        // Show the title and button again
+        document.getElementById('group-name').style.display = '';
+        document.getElementById('edit-group-btn').style.display = '';
+    }
+
     function openGiftModal() {
         document.getElementById('gift-modal').classList.add('is-active');
     }

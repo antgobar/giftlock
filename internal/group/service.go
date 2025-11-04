@@ -64,3 +64,7 @@ func (s *Service) LeaveGroup(ctx context.Context, userId model.UserId, groupID m
 	}
 	return s.repo.Leave(ctx, userId, groupID)
 }
+
+func (s *Service) UpdateName(ctx context.Context, createdBy model.UserId, groupID model.GroupId, newName string) (string, error) {
+	return s.repo.UpdateName(ctx, createdBy, groupID, newName)
+}

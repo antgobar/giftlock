@@ -145,3 +145,23 @@ func (s *PostgresRepo) Leave(ctx context.Context, userID model.UserId, groupID m
 	}
 	return nil
 }
+
+func (s *PostgresRepo) UpdateName(ctx context.Context, createdBy model.UserId, groupID model.GroupId, newName string) (string, error) {
+	sql := `
+		UPDATE groups
+		SET name = $1
+		WHERE id = $2 and created_by =$3
+	`
+
+	result, err := s.db.Exec(ctx, sql, newName, groupID, createdBy)
+	if err != nil {
+		return "", err
+	}
+
+	rowsAffected := result.RowsAffected()
+	if rowsAffected == 0 {
+		return "", fmt.Errorf("group does not exist, %v", groupID)
+	}
+
+	return newName, nil
+}

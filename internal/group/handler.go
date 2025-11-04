@@ -23,12 +23,13 @@ func NewHandler(svc *Service, p presentation.Presenter) *Handler {
 }
 
 func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
-	mux.HandleFunc("POST /groups", h.createGroup)
 	mux.HandleFunc("DELETE /groups/{id}", h.deleteOwnGroup)
 	mux.HandleFunc("GET /groups/{id}", h.viewGroup)
-	mux.HandleFunc("GET /groups", h.getCreatedGroups)
 	mux.HandleFunc("POST /groups/{id}/add-member/{memberId}", h.addMember)
 	mux.HandleFunc("POST /groups/{id}/leave", h.leaveGroup)
+	mux.HandleFunc("PUT /groups/{id}/edit-name", h.updateName)
+	mux.HandleFunc("POST /groups", h.createGroup)
+	mux.HandleFunc("GET /groups", h.getCreatedGroups)
 }
 
 func (h *Handler) createGroup(w http.ResponseWriter, r *http.Request) {
@@ -255,4 +256,43 @@ func (h *Handler) leaveGroup(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("HX-Redirect", "/dashboard")
 	w.WriteHeader(http.StatusOK)
+}
+
+func (h *Handler) updateName(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), time.Duration(time.Second*3))
+	defer cancel()
+
+	user, ok := auth.UserFromContext(r.Context())
+	if !ok {
+		log.Println("ERROR:", "no user in context")
+		http.Error(w, "Error getting user", http.StatusUnauthorized)
+		return
+	}
+
+	groupId, err := model.IdFromString[model.GroupId](r.PathValue("id"))
+	if err != nil {
+		log.Println("ERROR: invalid group id", err)
+		http.Error(w, "Invalid group id", http.StatusBadRequest)
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Invalid form data", http.StatusBadRequest)
+		return
+	}
+
+	newGroupName := r.FormValue("name")
+
+	newName, err := h.svc.UpdateName(ctx, user.ID, groupId, newGroupName)
+	if err != nil {
+		log.Println("ERROR:", err)
+		http.Error(w, "error updating group", http.StatusBadRequest)
+		return
+	}
+	data := struct {
+		GroupName string
+	}{
+		GroupName: newName,
+	}
+	h.p.Present(w, r, "update_group", data)
 }

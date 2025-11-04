@@ -66,7 +66,6 @@ func (h *SessionHandler) authMiddleware(next http.Handler) http.Handler {
 			http.Error(w, "Unauthenticated", http.StatusUnauthorized)
 			return
 		}
-		log.Println("USER:", user.Username, "ROLE", user.Role)
 		if isAdminPath && user.Role != "admin" {
 			http.Error(w, "Unauthenticated", http.StatusUnauthorized)
 			return
