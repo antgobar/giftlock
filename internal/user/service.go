@@ -30,6 +30,6 @@ func (s *Service) CheckUsernameExists(ctx context.Context, username string) (boo
 }
 
 func (s *Service) SearchUserNotInGroup(ctx context.Context, groupId model.GroupId, username string) ([]*model.User, error) {
-	limit := 1
+	limit := 5
 	return s.repo.SearchUserNotInGroup(ctx, groupId, username, limit)
 }
